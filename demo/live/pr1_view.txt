@@ -1,3 +1,2 @@
 PR #1  B01: fix /pay missing coupon and coupon bounds
-branch fix/B01 -> main   state: OPEN   author: ru-ji
-commits: Fix /pay: missing coupon defaults to 1, reject coupon outside (0, 1] … | Merge branch 'main' into fix/B01
+state: MERGED   merged by: ru-ji

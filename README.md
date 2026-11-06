@@ -44,7 +44,7 @@ flowchart LR
 | Does a change request stay out of the MVP? | `tools/versions.py` refuses v1.0, never opens SCOPE.md | `test_versions.py` |
 | Does the signed SCOPE.md match the executable contract? | `scope.json` is the source | `test_scope_sync.py` |
 | Does every demo case end where we say? | all of the above, live | `test_cases.py` |
-| Is a fix real? | CI `contract` job, required on PRs | red on main today, green with the fix |
+| Is a fix real? | CI `contract` job, required on PRs | red on main while B01, B03 and B09 were open; green since the fix PR (#1) was merged |
 
 **Live proof:** [demo/live-run.md](demo/live-run.md) has a real blind run of Claude Code against Codex on the demo cases: two AGREE, one real DISAGREE that `compare.py` caught, and the three design fixes it led to.
 
