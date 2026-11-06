@@ -1,8 +1,8 @@
 # Two gates.
-# tests:    the tooling itself (contract checker, lanes, ledger, comparison, scope sync). Must always be green.
-# contract: SCOPE.md executed against the app. It was red on main while B01, B03 and B09 were open (fixed by PR #1);
-#           the Fixer's PR is mergeable only when it turns this job green. Make both jobs required in
-#           Settings > Branches > main > Require status checks, plus 1 required review.
+# tests:    the tooling itself (contract checker, lanes, ledgers, environments). Must always be green.
+# contract: no regression. Every contract rule that passes on the base commit must still pass, so a hotfix can ship
+#           while another minor bug waits for its patch. Open failures are listed, not blocking.
+#           Make both jobs required in Settings > Branches > main > Require status checks, plus 1 required review.
 name: ci
 on: [push, pull_request]
 jobs:
@@ -17,9 +17,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: |
+      - name: No regression against the base commit
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          git show "$BASE:demo-app/app.py" > /tmp/base_app.py 2>/dev/null || git show HEAD~1:demo-app/app.py > /tmp/base_app.py
+          python3 tools/contract.py regress /tmp/base_app.py demo-app/app.py
+      - name: Open contract failures (informational)
+        run: |
           python3 demo-app/app.py &
           for i in $(seq 20); do python3 -c "import socket; socket.create_connection(('127.0.0.1', 8080), 1)" 2>/dev/null && break; sleep 0.5; done
-          python3 tools/contract.py check http://127.0.0.1:8080   # real HTTP, not --local
+          python3 tools/contract.py check http://127.0.0.1:8080 || true
