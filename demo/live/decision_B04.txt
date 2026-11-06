@@ -1,1 +1,0 @@
-2026-11-06 | B04 | backlog: CR-001 created (effort L), quote draft pending human send | hermes | out_of_scope, low, no security; PDF export not in SCOPE.md, needs a new PDF dependency

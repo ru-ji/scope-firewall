@@ -1,8 +1,0 @@
-PASS  F1  coupon 0.9 applies a 10% discount  -> 200 {"total": 18.0}
-PASS  F1  coupon 1 means no discount  -> 200 {"total": 20}
-FAIL  F2  missing coupon means no discount  -> 500 {"error": "TypeError(\"unsupported operand type(s) for *: 'int' and 'NoneType'\")"}
-FAIL  F2  null coupon means no discount  -> 500 {"error": "TypeError(\"unsupported operand type(s) for *: 'int' and 'NoneType'\")"}
-FAIL  F3  coupon 10 is rejected  -> 200 {"total": 200}
-FAIL  F3  coupon 1.5 is rejected  -> 200 {"total": 30.0}
-FAIL  F4  coupon 0 is rejected  -> 200 {"total": 0}
-FAIL  F4  negative coupon is rejected  -> 200 {"total": -10.0}

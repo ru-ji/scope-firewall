@@ -9,3 +9,4 @@ Status: proposed | quote-sent | accepted | rejected | delivered.
 | Version | Id | Origin (channel, date) | Request | Effort | Files touched | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | v1.0 | MVP | signed contract | rules F1-F6 of SCOPE.md | n/a | demo-app/app.py | delivered |
+| v1.1 | CR-001 | Slack, 2026-11-06 | PDF export of orders for accounting | L | demo-app/app.py (new export route + PDF library) | proposed |

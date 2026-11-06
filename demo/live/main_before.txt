@@ -1,1 +1,0 @@
-main before the fix:  contract FAIL  (6 of 8 checks: missing coupon, coupon above 1, coupon 0 or below)

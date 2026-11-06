@@ -1,8 +1,0 @@
-PASS  F1  coupon 0.9 applies a 10% discount  -> 200 {"total": 18.0}
-PASS  F1  coupon 1 means no discount  -> 200 {"total": 20}
-PASS  F2  missing coupon means no discount  -> 200 {"total": 20}
-PASS  F2  null coupon means no discount  -> 200 {"total": 20}
-PASS  F3  coupon 10 is rejected  -> 422 {"error": "coupon must be in ]0, 1]"}
-PASS  F3  coupon 1.5 is rejected  -> 422 {"error": "coupon must be in ]0, 1]"}
-PASS  F4  coupon 0 is rejected  -> 422 {"error": "coupon must be in ]0, 1]"}
-PASS  F4  negative coupon is rejected  -> 422 {"error": "coupon must be in ]0, 1]"}

@@ -1,7 +1,0 @@
-B03: the Verifier and Contradictor lines AGREE (rule=F3, defect, high, security=no).
-
-- **Lane:** patch. It's a non-blocking defect, so it goes in the next patch release.
-- **Window:** 03:30, the quietest 2 hours, which start at 03:00. Traffic there averages 300 requests/hour, against 4000/hour now.
-- **Rollback:** required. A rollback plan must be ready before the deploy.
-- **Deploy:** I don't deploy. Someone else runs it in the window.
-- **Log:** I added the decision to DECISIONS.md.

@@ -1,1 +1,0 @@
-2026-11-06 | B03 | patch lane, window 03:30 (rollback required) | hermes | VERDICT agreed: rule=F3 defect high security=no

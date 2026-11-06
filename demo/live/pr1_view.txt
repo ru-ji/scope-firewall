@@ -1,2 +1,0 @@
-PR #1  B01: fix /pay missing coupon and coupon bounds
-state: MERGED   merged by: ru-ji
