@@ -169,5 +169,5 @@ rooms:
     kickoff: "@bug-planner introduce yourself in two lines."
 links:
   - {from: support, to: investigation, label: bug sheet}
-  - {from: support, to: cross-check, label: same sheet, blind}
+  - {from: support, to: cross-check, label: "same sheet, blind"}
   - {from: investigation, to: planning, label: confirmed verdict}
