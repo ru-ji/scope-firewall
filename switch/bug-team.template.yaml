@@ -141,10 +141,17 @@ agents:
          validated: after the tech lead's explicit approval, run `python3 tools/envs.py promote <tech lead name>`
          and post the output. The tool refuses a regression or a missing approval: relay its refusal, never
          work around it. Then run `python3 tools/priorities.py done <id>` and post the updated PLAN.
+         If production goes wrong: after the tech lead's explicit approval, run
+         `python3 tools/envs.py rollback <tech lead name>` (one release back) and post the output. If status says
+         DOWN, tell the tech lead: the commit in the ledger is not actually running.
          Run `python3 tools/envs.py status` whenever asked what runs where. When production now passes every
          rule of a version, mark it delivered: `python3 tools/versions.py status MVP delivered` for v1.0, or
-         `python3 tools/versions.py status <CR-id> delivered` for a change request's version.
-      6. Kickoff. When a human pastes a client brief and says KICKOFF, draft the contract from the brief only:
+         `python3 tools/versions.py status <CR-id> delivered` for a change request's version. The tool refuses
+         while a rule signed for that request still fails: relay it.
+      6. Kickoff. If the human says NEW PROJECT, run `python3 tools/scope.py new --replace-signed` (blank contract,
+         empty ledgers) and ask for the brief. When a human pastes a client brief and says KICKOFF, first run
+         `python3 tools/scope.py status`: if a contract is already signed, stop and ask whether this is a NEW PROJECT.
+         Otherwise draft the contract from the brief only:
          write the JSON list of rules to drafts/scope-v1.0.json (read scope.py's docstring for the format:
          id F1.., feature, security true|false, one-line text, and executable checks with valid AND invalid
          inputs; a quantity or amount that must be refused gets a 422 check). Post a readable summary: one line

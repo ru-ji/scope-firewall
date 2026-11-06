@@ -16,6 +16,7 @@ import csv, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from plan_window import plan as window
 from triage_lane import SEVERITIES, lane
+from versions import delivered_versions
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 QUEUE, VERSIONS, TRAFFIC = (os.path.join(ROOT, f) for f in ("QUEUE.md", "VERSIONS.md", "data/traffic.csv"))
@@ -91,24 +92,10 @@ def features(path=VERSIONS):
 
 def base_version(rows, versions=VERSIONS):
     """Last delivered minor (e.g. v1.0) and the highest patch number already shipped on it."""
-    delivered = [l.split("|")[1].strip() for l in open(versions)
-                 if l.startswith("| v") and l.rstrip().endswith("| delivered |")] if os.path.exists(versions) else []
-    minor = max(delivered or ["v1.0"], key=lambda v: tuple(int(x) for x in v[1:].split(".")))
+    minor = max(delivered_versions(versions) or ["v1.0"], key=lambda v: tuple(int(x) for x in v[1:].split(".")))
     shipped = [int(r["Release"].rsplit(".", 1)[1]) for r in rows
                if r["Status"] == "done" and r["Release"].startswith(minor + ".")]
     return minor, max(shipped or [0])
-
-
-def delivered_versions(versions=VERSIONS):
-    """Versions whose ledger row says delivered (the MVP row for v1.0, a change request row for v1.1...)."""
-    if not os.path.exists(versions):
-        return set()
-    out = set()
-    for line in open(versions):
-        c = [x.strip() for x in line.strip().strip("|").split("|")]
-        if len(c) == 7 and c[0].startswith("v") and c[6] == "delivered":
-            out.add(c[0])
-    return out
 
 
 def pending_build(rules, failing, delivered):
@@ -124,7 +111,7 @@ def pending_build(rules, failing, delivered):
 def build_items(versions=VERSIONS):
     import contract
     failing = {c["rule"] for c in contract.run("--local") if not c["pass"]}
-    return pending_build(contract.SCOPE["rules"], failing, delivered_versions(versions))
+    return pending_build(contract.SCOPE["rules"], failing, delivered_versions(versions))  # app missing: every rule is listed
 
 
 def make_plan(rows, now=14, versions=VERSIONS, traffic=TRAFFIC, build="auto", signed=None):

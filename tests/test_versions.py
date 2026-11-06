@@ -1,6 +1,7 @@
 import os, sys, tempfile
 sys.path.insert(0, "tools")
-from versions import add, status
+import contract
+from versions import add, delivered_versions, next_version, status
 
 tmp = os.path.join(tempfile.mkdtemp(), "VERSIONS.md")
 open(tmp, "w").writelines(l for l in open("VERSIONS.md") if "| CR-" not in l)  # independent of CRs already logged
@@ -20,6 +21,24 @@ for bad in (lambda: add("x", "XL", "o", "f", path=tmp), lambda: add("x", "S", "o
         bad(); raise AssertionError("should have refused")
     except SystemExit:
         pass
+
+# A change request is delivered only when the rules signed for it pass.
+real_run, real_scope = contract.run, contract.SCOPE
+contract.SCOPE = {"amendments": [{"cr": "CR-001", "rules": ["F7"]}]}
+contract.run = lambda *a: [{"rule": "F7", "pass": False}]
+try:
+    status("CR-001", "delivered", path=tmp); raise AssertionError("F7 still fails")
+except SystemExit as e:
+    assert "F7" in str(e)
+contract.run = lambda *a: [{"rule": "F7", "pass": True}]
+status("CR-002", "accepted", path=tmp)
+status("CR-001", "delivered", path=tmp)
+contract.run, contract.SCOPE = real_run, real_scope
+assert "v1.1" not in delivered_versions(tmp) and next_version(tmp) == "v1.1"   # CR-002, accepted, is still in v1.1
+status("CR-002", "delivered", path=tmp)
+assert "v1.1" in delivered_versions(tmp) and next_version(tmp) == "v1.2"
+cid, quote = add("Next thing", "S", "Slack", "x", path=tmp)
+assert cid == "CR-003" and "v1.2" in quote                                     # never quoted into a shipped version
 
 assert open("SCOPE.md").read() == scope_before  # the frozen MVP is never touched
 print("ok")

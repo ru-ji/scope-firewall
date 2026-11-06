@@ -88,7 +88,9 @@ Also covered by the test set: B02 real usage mistake (`reply`), B09 coupon 0 = f
 | A verdict always matches the live app's behaviour | `contract.py` runs real requests | `tests/test_contract.py`: flags the demo app's 6 failing checks over HTTP and in-process, passes a correct reference implementation |
 | Agreement is checked field by field, not eyeballed | `compare.py` on the two VERDICT lines | `tests/test_compare.py` |
 | The signed SCOPE.md and the executable contract never drift | `scope.json` is the source; texts must match | `tests/test_scope_sync.py` |
-| A fix cannot merge unless the contract passes | CI `contract` job, required on `main` | red on the shipped app, green with the fix |
+| A fix cannot merge if it breaks a rule that passes | CI `contract` job, required on `main` | `contract.py regress`, PR #2 |
+| The frozen contract cannot be weakened by hand | CI `contract` job runs `scope.py verify-change` | `tests/test_scope.py` |
+| Production can go back one release, with a named approval | `envs.py rollback` | `tests/test_envs.py` |
 | A lane is always the same for the same verdict + severity | `triage_lane.py`, rejects unknown inputs | `tests/test_lane.py` |
 | Every demo case leads to its expected verdict and lane | the two tools above | `tests/test_cases.py` (runs the contract live for each case) |
 | A change request never enters the MVP | `versions.py` refuses `v1.0` and never opens SCOPE.md | `tests/test_versions.py` |

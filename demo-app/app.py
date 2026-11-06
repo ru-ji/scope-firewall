@@ -1,4 +1,4 @@
-"""Demo shop. BUG (case B01): /pay crashes when no coupon is sent (coupon=None)."""
+"""Demo shop: the app the contract in scope.json is checked against."""
 import json, os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 

@@ -46,6 +46,9 @@ for target in (url, "--local=tests/fixtures/shipped_app.py"):  # real HTTP and i
                       "negative quantity is rejected": 500}, failed
     assert [verdict(r, target)["security"] for r in ("F2", "F3", "F4", "F5", "F6")] == [False, False, True, False, True]
 assert verdict("none", url)["verdict"] == "out_of_scope"
+# Project start and outages: no app yet or no server is a failed check, never a crash.
+assert all(not c["pass"] for c in run("--local=tests/fixtures/not_built_yet.py"))
+assert all(not c["pass"] for c in run("http://127.0.0.1:9"))
 
 # A correct implementation passes every check, so a fix can be verified with the same tool.
 assert all(c["pass"] for c in run(good_url)), [c for c in run(good_url) if not c["pass"]]
