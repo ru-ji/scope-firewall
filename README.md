@@ -13,12 +13,12 @@ Agencies and freelancers lose the end of every MVP to "small fixes" that are rea
 
 ```mermaid
 flowchart LR
-  C[Client on WhatsApp / Slack / Discord] -->|teammate pastes| R["#report-a-bug<br/>Reception<br/>no repo access"]
-  R -->|same sheet| V["#bugs-dev<br/>Verifier · Claude Code"]
-  R -->|same sheet, blind| X["#counter-check<br/>Contradictor · Codex/GPT"]
+  C[Client on WhatsApp / Slack / Discord] -->|teammate pastes| R["#client-intake<br/>Reception<br/>no repo access"]
+  R -->|same sheet| V["#verification<br/>Verifier · Claude Code"]
+  R -->|same sheet, blind| X["#second-opinion<br/>Contradictor · Codex/GPT"]
   V -->|contract.py| L1[VERDICT line]
   X -->|contract.py| L2[VERDICT line]
-  L1 & L2 --> P["#deployment<br/>Planner: compare.py"]
+  L1 & L2 --> P["#release<br/>Planner: compare.py"]
   P -->|DISAGREE| H[Human decides]
   P -->|AGREE| T[triage_lane.py]
   H --> T
@@ -28,9 +28,9 @@ flowchart LR
 
 ## Why Switch is the core, not a wrapper
 
-- **Independence by room boundary.** The Contradictor is alone in `#counter-check`. It cannot read the Verifier's reasoning because it is not in that room, and the Verifier writes nothing to the repo until both verdicts are posted.
-- **Two providers in one team.** Claude Code verifies and Codex (GPT) counter-checks, so the two checks don't share the same model's blind spots.
-- **Security by room membership.** `#report-a-bug` is the only room that receives untrusted text, and no agent in it has repo access. Addressing rules limit every other agent to its owner.
+- **Independence by room boundary.** The Contradictor is alone in `#second-opinion`. It cannot read the Verifier's reasoning because it is not in that room, and the Verifier writes nothing to the repo until both verdicts are posted.
+- **Two providers in one team.** Claude Code verifies and Codex (GPT) second-opinions, so the two checks don't share the same model's blind spots.
+- **Security by room membership.** `#client-intake` is the only room that receives untrusted text, and no agent in it has repo access. Addressing rules limit every other agent to its owner.
 - **Humans in the loop where it matters.** The verdict and severity, every PR review, every deploy and every message to the client stay with a human.
 
 ## Nothing is left to model opinion
@@ -70,7 +70,7 @@ for t in tests/test_*.py; do python3 "$t" || break; done
 2. Connect Discord or Mattermost in Console.
 3. Import `switch/bug-team.template.yaml` (Templates > Import). It creates 5 agents and 4 rooms. In the form, pick your clone of this repo as `project`, and check that `provider` and `contradictor_provider` are different.
 4. On GitHub, make the `tests` and `contract` checks required for `main`, along with 1 review.
-5. In `#report-a-bug`, type `@bug-reception B10: <paste the client message>` (you pick the id) and forward the sheet to `#bugs-dev` and `#counter-check`.
+5. In `#client-intake`, type `@bug-reception B10: <paste the client message>` (you pick the id) and forward the sheet to `#verification` and `#second-opinion`.
 
 ## Demo cases
 
