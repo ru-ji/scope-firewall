@@ -17,7 +17,7 @@ add("B11", "defect", "high", "yes", "negative quantity gives a negative total", 
 add("B12", "defect", "high", "no", "wrong tax on some orders", "40", path=q)
 
 assert [r["Id"] for r in ranked(load(q))] == ["B11", "B12", "B03", "B10"]  # security, then affected, display last
-p = make_plan(load(q), 14, versions=v)
+p = make_plan(load(q), 14, versions=v, build={}, signed=True)
 assert [(b["Id"], b["lane"], b["slot"]) for b in p["bugs"]] == [
     ("B11", "hotfix", "now"), ("B12", "patch", "quiet window 03:30"),
     ("B03", "patch", "quiet window 03:30"), ("B10", "patch", "quiet window 03:30")]
@@ -30,7 +30,7 @@ assert "1. B11 [high, security]" in render(p) and "v1.0.1 hotfix, now: B11" in r
 assert done("B11", path=q, versions=v) == "v1.0.1"
 assert [r["Id"] for r in ranked(load(q))] == ["B12", "B03", "B10"]
 # After v1.0.1 shipped, the next deliverable is v1.0.2: version numbers never go back.
-assert [(r["version"], r["items"]) for r in make_plan(load(q), 14, versions=v)["releases"]][0] == ("v1.0.2", ["B12", "B03", "B10"])
+assert [(r["version"], r["items"]) for r in make_plan(load(q), 14, versions=v, build={}, signed=True)["releases"]][0] == ("v1.0.2", ["B12", "B03", "B10"])
 add("B12", "defect", "critical", "no", "wrong tax on every order", "40", path=q)  # re-assessed: updated, not duplicated
 assert [r["Id"] for r in ranked(load(q))] == ["B12", "B03", "B10"] and len(load(q)) == 4
 
@@ -40,4 +40,16 @@ for bad in (lambda: add("X1", "defect", "low", "no", "t", path=q), lambda: add("
         bad(); raise AssertionError("should have refused")
     except SystemExit:
         pass
+# Project start: before the signature the plan says so; after it, the developer's queue lists what to build.
+from priorities import pending_build, delivered_versions
+rules = [{"id": "F1", "feature": "Total", "version": "v1.0"}, {"id": "F2", "feature": "Coupon", "version": "v1.0"},
+         {"id": "F3", "feature": "Order reference", "version": "v1.1"}, {"id": "F4", "feature": "Legacy"}]
+assert pending_build(rules, {"F1", "F2", "F3", "F4"}, set()) == {"v1.0": ["F1 Total", "F2 Coupon", "F4 Legacy"], "v1.1": ["F3 Order reference"]}
+assert pending_build(rules, {"F2", "F3", "F4"}, {"v1.0"}) == {"v1.1": ["F3 Order reference"]}   # v1.0 delivered: F2, F4 are defects
+open(v, "a").write("| v1.0 | MVP | kickoff | rules | n/a | app | delivered |\n")
+assert delivered_versions(v) == {"v1.0"}
+p0 = make_plan([], 14, versions=v, build={}, signed=False)
+assert [(r["kind"], r["items"]) for r in p0["releases"]][0] == ("kickoff", ["the contract is not signed yet"])
+p1 = make_plan([], 14, versions=v, build={"v1.0": ["F1 Total"]}, signed=True)
+assert [r["kind"] for r in p1["releases"]] == ["build", "features"] and "v1.0 build" in render(p1)
 print("ok")

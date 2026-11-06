@@ -99,7 +99,35 @@ def base_version(rows, versions=VERSIONS):
     return minor, max(shipped or [0])
 
 
-def make_plan(rows, now=14, versions=VERSIONS, traffic=TRAFFIC):
+def delivered_versions(versions=VERSIONS):
+    """Versions whose ledger row says delivered (the MVP row for v1.0, a change request row for v1.1...)."""
+    if not os.path.exists(versions):
+        return set()
+    out = set()
+    for line in open(versions):
+        c = [x.strip() for x in line.strip().strip("|").split("|")]
+        if len(c) == 7 and c[0].startswith("v") and c[6] == "delivered":
+            out.add(c[0])
+    return out
+
+
+def pending_build(rules, failing, delivered):
+    """The developer's queue: rules of versions not delivered yet that the app does not pass."""
+    out = {}
+    for r in rules:
+        v = r.get("version", "v1.0")
+        if v not in delivered and r["id"] in failing:
+            out.setdefault(v, []).append(f"{r['id']} {r['feature']}")
+    return out
+
+
+def build_items(versions=VERSIONS):
+    import contract
+    failing = {c["rule"] for c in contract.run("--local") if not c["pass"]}
+    return pending_build(contract.SCOPE["rules"], failing, delivered_versions(versions))
+
+
+def make_plan(rows, now=14, versions=VERSIONS, traffic=TRAFFIC, build="auto", signed=None):
     quiet = window(list(csv.DictReader(open(traffic))), "minor", now)["when"]
     bugs = []
     for rank, r in enumerate(ranked(rows), 1):
@@ -112,6 +140,14 @@ def make_plan(rows, now=14, versions=VERSIONS, traffic=TRAFFIC):
         if items:
             patch += 1
             releases.append({"version": f"{minor}.{patch}", "kind": l, "when": when, "items": items})
+    if build == "auto":
+        import contract
+        build, signed = build_items(versions), contract.SCOPE.get("frozen", False)
+    if signed is False:
+        releases.append({"version": "v1.0", "kind": "kickoff", "when": "waiting for a client brief and a signature",
+                         "items": ["the contract is not signed yet"]})
+    for v, items in (build or {}).items():
+        releases.append({"version": v, "kind": "build", "when": "developer's queue, built by pull request", "items": items})
     feats = features(versions)
     for v in dict.fromkeys(f["version"] for f in feats):
         releases.append({"version": v, "kind": "features", "when": "after written client approval",

@@ -161,5 +161,10 @@
     }
    ]
   }
- ]
+ ],
+ "frozen": true,
+ "signed": {
+  "by": "asher (tech lead)",
+  "date": "2026-11-05"
+ }
 }

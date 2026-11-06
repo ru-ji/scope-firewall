@@ -1,0 +1,165 @@
+{
+ "version": "v1.0",
+ "endpoint": "/pay",
+ "app": "demo-app/app.py",
+ "rules": [
+  {
+   "id": "F1",
+   "feature": "`POST /pay`",
+   "security": false,
+   "text": "JSON body `{price, qty, coupon?}`. Returns `200 {\"total\": price * qty * coupon}`. Example: price 10, qty 2, coupon 0.9 → 18.0.",
+   "checks": [
+    {
+     "name": "coupon 0.9 applies a 10% discount",
+     "body": {
+      "price": 10,
+      "qty": 2,
+      "coupon": 0.9
+     },
+     "status": 200,
+     "total": 18.0
+    },
+    {
+     "name": "coupon 1 means no discount",
+     "body": {
+      "price": 10,
+      "qty": 2,
+      "coupon": 1
+     },
+     "status": 200,
+     "total": 20
+    }
+   ]
+  },
+  {
+   "id": "F2",
+   "feature": "Optional coupon",
+   "security": false,
+   "text": "Missing or `null` coupon means `1` (no discount): price 10, qty 2 → 20.",
+   "checks": [
+    {
+     "name": "missing coupon means no discount",
+     "body": {
+      "price": 10,
+      "qty": 2
+     },
+     "status": 200,
+     "total": 20
+    },
+    {
+     "name": "null coupon means no discount",
+     "body": {
+      "price": 10,
+      "qty": 2,
+      "coupon": null
+     },
+     "status": 200,
+     "total": 20
+    }
+   ]
+  },
+  {
+   "id": "F3",
+   "feature": "Coupon upper bound",
+   "security": false,
+   "text": "A coupon above `1` is rejected with `422`; a total is never computed from it.",
+   "checks": [
+    {
+     "name": "coupon 10 is rejected",
+     "body": {
+      "price": 10,
+      "qty": 2,
+      "coupon": 10
+     },
+     "status": 422,
+     "total": null
+    },
+    {
+     "name": "coupon 1.5 is rejected",
+     "body": {
+      "price": 10,
+      "qty": 2,
+      "coupon": 1.5
+     },
+     "status": 422,
+     "total": null
+    }
+   ]
+  },
+  {
+   "id": "F4",
+   "feature": "Coupon lower bound",
+   "security": true,
+   "text": "A coupon of `0` or below is rejected with `422`, so no order is ever free or negative.",
+   "checks": [
+    {
+     "name": "coupon 0 is rejected",
+     "body": {
+      "price": 10,
+      "qty": 2,
+      "coupon": 0
+     },
+     "status": 422,
+     "total": null
+    },
+    {
+     "name": "negative coupon is rejected",
+     "body": {
+      "price": 10,
+      "qty": 2,
+      "coupon": -0.5
+     },
+     "status": 422,
+     "total": null
+    }
+   ]
+  },
+  {
+   "id": "F5",
+   "feature": "Receipt shows the currency",
+   "security": false,
+   "text": "Every successful total is returned with its currency: `{\"total\": ..., \"currency\": \"EUR\"}`, so the checkout page can display it.",
+   "checks": [
+    {
+     "name": "total comes with its currency",
+     "body": {
+      "price": 10,
+      "qty": 2,
+      "coupon": 1
+     },
+     "status": 200,
+     "total": 20,
+     "fields": {
+      "currency": "EUR"
+     }
+    }
+   ]
+  },
+  {
+   "id": "F6",
+   "feature": "Quantity",
+   "security": true,
+   "text": "`qty` is a whole number of `1` or more. Anything else is rejected with `422`, so no order is ever free or negative.",
+   "checks": [
+    {
+     "name": "quantity 0 is rejected",
+     "body": {
+      "price": 10,
+      "qty": 0
+     },
+     "status": 422,
+     "total": null
+    },
+    {
+     "name": "negative quantity is rejected",
+     "body": {
+      "price": 10,
+      "qty": -3
+     },
+     "status": 422,
+     "total": null
+    }
+   ]
+  }
+ ]
+}

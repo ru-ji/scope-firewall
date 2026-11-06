@@ -1,7 +1,10 @@
-# SCOPE: frozen MVP (v1.0)
+# SCOPE: contract v1.0 (frozen)
 
 The signed contract. Every report is judged against this file, and every rule here is executable:
-`python3 tools/contract.py check` runs it against the app (rules and checks live in [scope.json](scope.json); F4 and F6 are security rules). Changing this file requires a signed amendment, never a "small addition".
+`python3 tools/contract.py check` runs it against the app (rules and checks live in [scope.json](scope.json); security rules: F4, F6).
+It changes only through `python3 tools/scope.py amend`, for a change request the client accepted: never a "small addition".
+
+Signed by asher (tech lead) on 2026-11-05. Amendments: none.
 
 ## Rules
 | Id | Feature | Required behaviour |
@@ -13,8 +16,8 @@ The signed contract. Every report is judged against this file, and every rule he
 | F5 | Receipt shows the currency | Every successful total is returned with its currency: `{"total": ..., "currency": "EUR"}`, so the checkout page can display it. |
 | F6 | Quantity | `qty` is a whole number of `1` or more. Anything else is rejected with `422`, so no order is ever free or negative. |
 
-## Out of scope (examples, billed as an amendment)
-PDF/CSV export, new payment methods, multi-currency, mobile app, dashboard, any new route.
+## Out of scope
+Anything no rule covers. It is never done for free: it becomes a change request with a quote in [VERSIONS.md](VERSIONS.md).
 
 ## Verdict rule (applied by `tools/contract.py verdict <rule>`)
 | Situation | Verdict | Who is at fault |

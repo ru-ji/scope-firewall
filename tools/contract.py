@@ -12,11 +12,13 @@ target: --local (default) drives the app's own HTTP handler in-process, with no 
 import importlib.util, io, json, os, sys, urllib.error, urllib.request
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-SCOPE = json.load(open(os.path.join(ROOT, "scope.json")))
+SCOPE_FILE = os.environ.get("SCOPE_FILE") or os.path.join(ROOT, "scope.json")  # tests point it at a frozen contract
+SCOPE = json.load(open(SCOPE_FILE))
 RULES = {r["id"]: r for r in SCOPE["rules"]}
-# (rule, check name, request body, expected status, expected total or None, other expected response fields)
-CHECKS = [(r["id"], c["name"], c["body"], c["status"], c["total"], c.get("fields", {}))
-          for r in SCOPE["rules"] for c in r["checks"]]
+# (rule, check name, request body, expected status, expected total or None, exact response fields,
+#  response fields that must be present, request path)
+CHECKS = [(r["id"], c["name"], c["body"], c["status"], c.get("total"), c.get("fields", {}), c.get("present", []),
+           c.get("path") or SCOPE["endpoint"]) for r in SCOPE["rules"] for c in r["checks"]]
 
 
 class _Sock:
@@ -34,7 +36,7 @@ class _Sock:
 _handlers = {}
 
 
-def _post_local(body, app=None):
+def _post_local(body, app=None, path=None):
     app = os.path.join(ROOT, app or SCOPE["app"])
     if app not in _handlers:
         spec = importlib.util.spec_from_file_location(f"scope_app_{len(_handlers)}", app)
@@ -42,7 +44,7 @@ def _post_local(body, app=None):
         spec.loader.exec_module(mod)
         _handlers[app] = type("Quiet", (mod.H,), {"log_message": lambda *a: None})
     data = json.dumps(body).encode()
-    raw = (f"POST {SCOPE['endpoint']} HTTP/1.1\r\nHost: local\r\nContent-Type: application/json\r\n"
+    raw = (f"POST {path or SCOPE['endpoint']} HTTP/1.1\r\nHost: local\r\nContent-Type: application/json\r\n"
            f"Content-Length: {len(data)}\r\n\r\n").encode() + data
     sock = _Sock(raw)
     _handlers[app](sock, ("local", 0), None)
@@ -50,8 +52,8 @@ def _post_local(body, app=None):
     return int(head.split()[1]), payload.decode()
 
 
-def _post_http(base, body):
-    req = urllib.request.Request(base.rstrip("/") + SCOPE["endpoint"], json.dumps(body).encode(),
+def _post_http(base, body, path=None):
+    req = urllib.request.Request(base.rstrip("/") + (path or SCOPE["endpoint"]), json.dumps(body).encode(),
                                  {"Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=5) as r:
@@ -60,18 +62,18 @@ def _post_http(base, body):
         return e.code, e.read().decode()
 
 
-def post(target, body):
+def post(target, body, path=None):
     if target.startswith("--local"):
-        return _post_local(body, target.partition("=")[2] or None)
-    return _post_http(target, body)
+        return _post_local(body, target.partition("=")[2] or None, path)
+    return _post_http(target, body, path)
 
 
 def run(target="--local", rule=None):
     out = []
-    for r, name, body, status, total, fields in CHECKS:
+    for r, name, body, status, total, fields, present, path in CHECKS:
         if rule and r != rule:
             continue
-        code, raw = post(target, body)
+        code, raw = post(target, body, path)
         try:
             obj = json.loads(raw)
             obj = obj if isinstance(obj, dict) else {}
@@ -79,8 +81,9 @@ def run(target="--local", rule=None):
             obj = {}
         got = obj.get("total")
         ok = (code == status and (total is None or (isinstance(got, (int, float)) and abs(got - total) < 1e-9))
-              and all(obj.get(k) == v for k, v in fields.items()))
-        out.append({"rule": r, "check": name, "request": body, "expected": {"status": status, "total": total, **fields},
+              and all(obj.get(k) == v for k, v in fields.items()) and all(k in obj for k in present))
+        out.append({"rule": r, "check": name, "request": body, "path": path,
+                    "expected": {"status": status, "total": total, **fields, **({"present": present} if present else {})},
                     "observed": {"status": code, "body": raw}, "pass": ok})
     return out
 

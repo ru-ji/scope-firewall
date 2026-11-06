@@ -1,4 +1,6 @@
 """The contract checker must flag the shipped app's real defects (frozen in tests/fixtures) AND pass a correct implementation."""
+import os
+os.environ["SCOPE_FILE"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "scope_demo.json")  # tests judge the frozen demo contract, whatever the live scope is
 import json, sys, threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 

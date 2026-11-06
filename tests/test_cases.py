@@ -1,4 +1,6 @@
 """Every test case is consistent with the tools: the live contract gives the expected verdict, the lane script the expected lane."""
+import os
+os.environ["SCOPE_FILE"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "scope_demo.json")  # tests judge the frozen demo contract, whatever the live scope is
 import json, sys, threading
 from http.server import HTTPServer
 
