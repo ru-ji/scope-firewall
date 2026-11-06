@@ -1,0 +1,11 @@
+{
+ "id": "B03",
+ "result": "AGREE",
+ "diff": {},
+ "agreed": {
+  "rule": "F3",
+  "verdict": "defect",
+  "severity": "high",
+  "security": "no"
+ }
+}

@@ -1,0 +1,1 @@
+VERDICT B04 rule=none verdict=out_of_scope severity=low security=no

@@ -1,0 +1,1 @@
+VERDICT B03 rule=F3 verdict=defect severity=high security=no

@@ -1,0 +1,1 @@
+VERDICT B01 rule=F1 verdict=usage severity=low security=no

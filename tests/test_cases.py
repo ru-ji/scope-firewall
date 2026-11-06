@@ -1,0 +1,32 @@
+"""Every test case is consistent with the tools: the live contract gives the expected verdict, the lane script the expected lane."""
+import json, sys, threading
+from http.server import HTTPServer
+
+sys.path[:0] = ["tools", "demo-app"]
+import app
+from contract import verdict
+from triage_lane import lane
+
+cases = json.load(open("bugs/cases.json"))
+assert len({c["id"] for c in cases}) == len(cases)
+assert sorted(c["demo"] for c in cases if "demo" in c) == [1, 2, 3, 4]
+
+app.H.log_message = lambda *a: None
+s = HTTPServer(("127.0.0.1", 0), app.H)
+threading.Thread(target=s.serve_forever, daemon=True).start()
+url = f"http://127.0.0.1:{s.server_port}"
+
+for c in cases:
+    if c.get("expected_action"):
+        assert c["expected_action"] in ("refuse", "mask") and c["expected_verdict"] is None, c["id"]
+        continue
+    if c["rule"] is not None:
+        v = verdict(c["rule"], url)
+        assert v["verdict"] == c["expected_verdict"], (c["id"], v["verdict"])
+        assert v["security"] == c["security"], (c["id"], "security flag must come from the contract")
+        assert verdict(c["rule"])["verdict"] == v["verdict"], (c["id"], "--local and HTTP must agree")
+    got = lane(c["expected_verdict"], c["severity"], c["security"])["lane"]
+    assert got == c["expected_lane"], (c["id"], got)
+
+s.shutdown()
+print("ok")

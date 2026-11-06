@@ -1,0 +1,1 @@
+VERDICT B01 rule=F2 verdict=defect severity=critical security=no

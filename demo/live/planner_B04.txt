@@ -1,0 +1,9 @@
+**B04: both verdict lines agree, and the lane is backlog.**
+
+- **Verdict:** out_of_scope, severity low, no security impact. The PDF export isn't in SCOPE.md, so it stays out of the MVP.
+- **Change request:** I created CR-001 with effort L. I rated it L because PDF output needs a new dependency, since Python's standard library can't write PDFs. The file touched is `demo-app/app.py`. I found no orders route there, so this file list is a guess.
+- **Quote draft for you to send:**
+  > "PDF export of orders for accounting" is not part of the signed MVP (SCOPE.md). Estimated effort L (over 2 days). It will ship in v1.1 after your written approval, billed separately from the MVP. The MVP delivery date is unchanged.
+- **Decision log:** I appended the B04 decision to DECISIONS.md.
+
+@hermes, tell me once the quote has been sent. I'll then set CR-001 to `quote-sent`.

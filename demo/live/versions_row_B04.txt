@@ -1,0 +1,1 @@
+| v1.1 | CR-001 | Slack, 2026-11-06 | PDF export of orders for accounting | L | demo-app/app.py | proposed |

@@ -1,0 +1,25 @@
+# Two gates.
+# tests:    the tooling itself (contract checker, lanes, ledger, comparison, scope sync). Must always be green.
+# contract: SCOPE.md executed against the shipped app. Red on main while known defects (B01, B03, B09) are open;
+#           the Fixer's PR is mergeable only when it turns this job green. Make both jobs required in
+#           Settings > Branches > main > Require status checks, plus 1 required review.
+name: ci
+on: [push, pull_request]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: for t in tests/test_*.py; do echo "== $t"; python3 "$t" || exit 1; done
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: |
+          python3 demo-app/app.py &
+          for i in $(seq 20); do python3 -c "import socket; socket.create_connection(('127.0.0.1', 8080), 1)" 2>/dev/null && break; sleep 0.5; done
+          python3 tools/contract.py check http://127.0.0.1:8080   # real HTTP, not --local

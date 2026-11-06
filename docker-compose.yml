@@ -1,0 +1,7 @@
+# Demo target only (the Switch server is started by Switch Console).
+services:
+  demo-app:
+    image: python:3.12-slim
+    command: python /app/app.py
+    volumes: ["./demo-app:/app:ro"]
+    ports: ["8080:8080"]

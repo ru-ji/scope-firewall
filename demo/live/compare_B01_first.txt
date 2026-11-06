@@ -1,0 +1,19 @@
+{
+ "id": "B01",
+ "result": "DISAGREE",
+ "diff": {
+  "rule": [
+   "F2",
+   "F1"
+  ],
+  "verdict": [
+   "defect",
+   "usage"
+  ],
+  "severity": [
+   "critical",
+   "low"
+  ]
+ },
+ "agreed": null
+}
