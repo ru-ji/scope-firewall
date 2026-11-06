@@ -3,6 +3,8 @@ import json, os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 def total(price, qty, coupon):
+    if isinstance(qty, bool) or not isinstance(qty, int) or qty < 1:
+        raise ValueError("qty must be a whole number of 1 or more")  # F6
     if coupon is None:
         coupon = 1  # F2: missing/null coupon means no discount
     if not 0 < coupon <= 1:
