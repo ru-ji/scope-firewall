@@ -1,9 +1,9 @@
-"""The contract checker must flag the demo app's real defects AND pass a correct implementation."""
+"""The contract checker must flag the shipped app's real defects (frozen in tests/fixtures) AND pass a correct implementation."""
 import json, sys, threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-sys.path[:0] = ["tools", "demo-app"]
-import app
+sys.path[:0] = ["tools", "tests/fixtures"]
+import shipped_app as app  # frozen copy of the shipped app, so fixing demo-app/ never breaks these tests
 from contract import run, verdict
 
 
@@ -28,14 +28,14 @@ demo, url = serve(app.H)
 good, good_url = serve(Correct)
 
 # Demo app as shipped: F1 holds; F2 (B01), F3 (B03) and F4 (B09, security) are broken.
-for target in (url, "--local"):  # real HTTP and in-process must give the same facts
+for target in (url, "--local=tests/fixtures/shipped_app.py"):  # real HTTP and in-process must give the same facts
     assert verdict("F1", target)["verdict"] == "usage"
     failed = {c["check"]: c["observed"]["status"] for r in ("F2", "F3", "F4") for c in verdict(r, target)["failed"]}
     assert failed == {"missing coupon means no discount": 500, "null coupon means no discount": 500,
                       "coupon 10 is rejected": 200, "coupon 1.5 is rejected": 200,
                       "coupon 0 is rejected": 200, "negative coupon is rejected": 200}, failed
     assert [verdict(r, target)["security"] for r in ("F2", "F3", "F4")] == [False, False, True]
-assert verdict("none")["verdict"] == "out_of_scope"
+assert verdict("none", url)["verdict"] == "out_of_scope"
 
 # A correct implementation passes every check, so a fix can be verified with the same tool.
 assert all(c["pass"] for c in run(good_url)), [c for c in run(good_url) if not c["pass"]]
