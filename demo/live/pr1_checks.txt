@@ -1,0 +1,4 @@
+contract   pass   11s
+contract   pass   10s
+tests      pass   5s
+tests      pass   6s
