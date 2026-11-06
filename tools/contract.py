@@ -13,8 +13,9 @@ import importlib.util, io, json, os, sys, urllib.error, urllib.request
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 SCOPE = json.load(open(os.path.join(ROOT, "scope.json")))
 RULES = {r["id"]: r for r in SCOPE["rules"]}
-# (rule, check name, request body, expected status, expected total or None)
-CHECKS = [(r["id"], c["name"], c["body"], c["status"], c["total"]) for r in SCOPE["rules"] for c in r["checks"]]
+# (rule, check name, request body, expected status, expected total or None, other expected response fields)
+CHECKS = [(r["id"], c["name"], c["body"], c["status"], c["total"], c.get("fields", {}))
+          for r in SCOPE["rules"] for c in r["checks"]]
 
 
 class _Sock:
@@ -66,16 +67,19 @@ def post(target, body):
 
 def run(target="--local", rule=None):
     out = []
-    for r, name, body, status, total in CHECKS:
+    for r, name, body, status, total, fields in CHECKS:
         if rule and r != rule:
             continue
         code, raw = post(target, body)
         try:
-            got = json.loads(raw).get("total")
-        except (ValueError, AttributeError):
-            got = None
-        ok = code == status and (total is None or (isinstance(got, (int, float)) and abs(got - total) < 1e-9))
-        out.append({"rule": r, "check": name, "request": body, "expected": {"status": status, "total": total},
+            obj = json.loads(raw)
+            obj = obj if isinstance(obj, dict) else {}
+        except ValueError:
+            obj = {}
+        got = obj.get("total")
+        ok = (code == status and (total is None or (isinstance(got, (int, float)) and abs(got - total) < 1e-9))
+              and all(obj.get(k) == v for k, v in fields.items()))
+        out.append({"rule": r, "check": name, "request": body, "expected": {"status": status, "total": total, **fields},
                     "observed": {"status": code, "body": raw}, "pass": ok})
     return out
 

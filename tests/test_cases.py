@@ -9,7 +9,7 @@ from triage_lane import lane
 
 cases = json.load(open("bugs/cases.json"))
 assert len({c["id"] for c in cases}) == len(cases)
-assert sorted(c["demo"] for c in cases if "demo" in c) == [1, 2, 3, 4]
+assert sorted(c["demo"] for c in cases if "demo" in c) == [1, 2, 3, 4, 5, 6]
 
 app.H.log_message = lambda *a: None
 s = HTTPServer(("127.0.0.1", 0), app.H)

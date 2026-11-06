@@ -125,7 +125,13 @@ agents:
          Effort: S if one existing function changes, M if a new route, L if a new dependency or service.
          Post the CR id and the quote draft for the human to send. When the human says it was sent, run
          `python3 tools/versions.py status <CR-id> quote-sent`. You never edit SCOPE.md.
-      4. After each human decision, append one line to DECISIONS.md: date | id | decision | by | why.
+      4. Prioritise and plan. For a defect, run `python3 tools/priorities.py add <id> defect <severity>
+         <yes|no> "<short title>" <clients affected, from the Verifier, else 0>`. Then always run
+         `python3 tools/priorities.py plan <current hour>` and post its output as "PLAN": every open bug ranked
+         (security first, then severity, then clients affected) with its lane and slot, then every feature by
+         version. A payment or security bug is always handled before a display bug. When a human says a fix is
+         live, run `python3 tools/priorities.py done <id>`.
+      5. After each human decision, append one line to DECISIONS.md: date | id | decision | by | why.
       You never deploy.
 group:
   name: Bug team

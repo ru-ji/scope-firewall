@@ -40,6 +40,7 @@ flowchart LR
 | Does the app break the contract? | `tools/contract.py` runs real requests from [scope.json](scope.json) | `test_contract.py` (flags the 6 failing checks over HTTP and in-process, passes a correct implementation) |
 | Do the two agents agree? | `tools/compare.py` on their `VERDICT` lines | `test_compare.py` |
 | Which exit? | `tools/triage_lane.py` | `test_lane.py` |
+| Which bug first? | `tools/priorities.py`: security, then severity, then clients affected; plans bugs and features | `test_priorities.py` |
 | When to deploy a patch? | `tools/plan_window.py` on hourly traffic | `test_plan.py` |
 | Does a change request stay out of the MVP? | `tools/versions.py` refuses v1.0, never opens SCOPE.md | `test_versions.py` |
 | Does the signed SCOPE.md match the executable contract? | `scope.json` is the source | `test_scope_sync.py` |

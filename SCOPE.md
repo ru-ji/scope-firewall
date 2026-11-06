@@ -1,7 +1,7 @@
 # SCOPE: frozen MVP (v1.0)
 
 The signed contract. Every report is judged against this file, and every rule here is executable:
-`python3 tools/contract.py check` runs it against the app (rules and checks live in [scope.json](scope.json); F4 is a security rule). Changing this file requires a signed amendment, never a "small addition".
+`python3 tools/contract.py check` runs it against the app (rules and checks live in [scope.json](scope.json); F4 and F6 are security rules). Changing this file requires a signed amendment, never a "small addition".
 
 ## Rules
 | Id | Feature | Required behaviour |
@@ -10,6 +10,8 @@ The signed contract. Every report is judged against this file, and every rule he
 | F2 | Optional coupon | Missing or `null` coupon means `1` (no discount): price 10, qty 2 → 20. |
 | F3 | Coupon upper bound | A coupon above `1` is rejected with `422`; a total is never computed from it. |
 | F4 | Coupon lower bound | A coupon of `0` or below is rejected with `422`, so no order is ever free or negative. |
+| F5 | Receipt shows the currency | Every successful total is returned with its currency: `{"total": ..., "currency": "EUR"}`, so the checkout page can display it. |
+| F6 | Quantity | `qty` is a whole number of `1` or more. Anything else is rejected with `422`, so no order is ever free or negative. |
 
 ## Out of scope (examples, billed as an amendment)
 PDF/CSV export, new payment methods, multi-currency, mobile app, dashboard, any new route.

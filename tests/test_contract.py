@@ -12,7 +12,13 @@ class Correct(BaseHTTPRequestHandler):
     def do_POST(self):
         b = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         c = 1 if b.get("coupon") is None else b["coupon"]
-        out, code = ({"total": b["price"] * b["qty"] * c}, 200) if 0 < c <= 1 else ({"error": "coupon must be in ]0, 1]"}, 422)
+        q = b["qty"]
+        if not (isinstance(q, int) and q >= 1):
+            out, code = {"error": "qty must be a whole number of 1 or more"}, 422
+        elif not 0 < c <= 1:
+            out, code = {"error": "coupon must be in ]0, 1]"}, 422
+        else:
+            out, code = {"total": b["price"] * q * c, "currency": "EUR"}, 200
         self.send_response(code); self.end_headers(); self.wfile.write(json.dumps(out).encode())
     def log_message(self, *a): pass
 
@@ -27,19 +33,21 @@ app.H.log_message = lambda *a: None
 demo, url = serve(app.H)
 good, good_url = serve(Correct)
 
-# Demo app as shipped: F1 holds; F2 (B01), F3 (B03) and F4 (B09, security) are broken.
+# Demo app as shipped: F1 holds; F2 (B01), F3 (B03), F4 (B09, security), F5 (B10, display) and F6 (B11, security) are broken.
 for target in (url, "--local=tests/fixtures/shipped_app.py"):  # real HTTP and in-process must give the same facts
     assert verdict("F1", target)["verdict"] == "usage"
-    failed = {c["check"]: c["observed"]["status"] for r in ("F2", "F3", "F4") for c in verdict(r, target)["failed"]}
+    failed = {c["check"]: c["observed"]["status"] for r in ("F2", "F3", "F4", "F5", "F6") for c in verdict(r, target)["failed"]}
     assert failed == {"missing coupon means no discount": 500, "null coupon means no discount": 500,
                       "coupon 10 is rejected": 200, "coupon 1.5 is rejected": 200,
-                      "coupon 0 is rejected": 200, "negative coupon is rejected": 200}, failed
-    assert [verdict(r, target)["security"] for r in ("F2", "F3", "F4")] == [False, False, True]
+                      "coupon 0 is rejected": 200, "negative coupon is rejected": 200,
+                      "total comes with its currency": 200, "quantity 0 is rejected": 500,
+                      "negative quantity is rejected": 500}, failed
+    assert [verdict(r, target)["security"] for r in ("F2", "F3", "F4", "F5", "F6")] == [False, False, True, False, True]
 assert verdict("none", url)["verdict"] == "out_of_scope"
 
 # A correct implementation passes every check, so a fix can be verified with the same tool.
 assert all(c["pass"] for c in run(good_url)), [c for c in run(good_url) if not c["pass"]]
-assert all(verdict(r, good_url)["verdict"] == "usage" and not verdict(r, good_url)["security"] for r in ("F2", "F3", "F4"))
+assert all(verdict(r, good_url)["verdict"] == "usage" and not verdict(r, good_url)["security"] for r in ("F2", "F3", "F4", "F5", "F6"))
 
 demo.shutdown(); good.shutdown()
 print("ok")
