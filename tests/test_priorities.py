@@ -22,15 +22,20 @@ assert [(b["Id"], b["lane"], b["slot"]) for b in p["bugs"]] == [
     ("B11", "hotfix", "now"), ("B12", "patch", "quiet window 03:30"),
     ("B03", "patch", "quiet window 03:30"), ("B10", "patch", "quiet window 03:30")]
 assert [f["id"] for f in p["features"]] == ["CR-001", "CR-002"]  # accepted before proposed, rejected dropped
-assert "1. B11 [high, security]" in render(p)
+# Deliverables: the security fix ships alone now; the rest ship together in the quiet window; features in v1.1.
+assert [(r["version"], r["kind"], r["items"]) for r in p["releases"]] == [
+    ("v1.0.1", "hotfix", ["B11"]), ("v1.0.2", "patch", ["B12", "B03", "B10"]), ("v1.1", "features", ["CR-001", "CR-002"])]
+assert "1. B11 [high, security]" in render(p) and "v1.0.1 hotfix, now: B11" in render(p)
 
-done("B11", path=q)
+assert done("B11", path=q, versions=v) == "v1.0.1"
 assert [r["Id"] for r in ranked(load(q))] == ["B12", "B03", "B10"]
+# After v1.0.1 shipped, the next deliverable is v1.0.2: version numbers never go back.
+assert [(r["version"], r["items"]) for r in make_plan(load(q), 14, versions=v)["releases"]][0] == ("v1.0.2", ["B12", "B03", "B10"])
 add("B12", "defect", "critical", "no", "wrong tax on every order", "40", path=q)  # re-assessed: updated, not duplicated
 assert [r["Id"] for r in ranked(load(q))] == ["B12", "B03", "B10"] and len(load(q)) == 4
 
 for bad in (lambda: add("X1", "defect", "low", "no", "t", path=q), lambda: add("B20", "out_of_scope", "low", "no", "t", path=q),
-            lambda: add("B20", "defect", "urgent", "no", "t", path=q), lambda: done("B99", path=q)):
+            lambda: add("B20", "defect", "urgent", "no", "t", path=q), lambda: done("B99", path=q, versions=v), lambda: done("B11", path=q, versions=v)):
     try:
         bad(); raise AssertionError("should have refused")
     except SystemExit:

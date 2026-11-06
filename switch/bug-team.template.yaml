@@ -128,9 +128,10 @@ agents:
       4. Prioritise and plan. For a defect, run `python3 tools/priorities.py add <id> defect <severity>
          <yes|no> "<short title>" <clients affected, from the Verifier, else 0>`. Then always run
          `python3 tools/priorities.py plan <current hour>` and post its output as "PLAN": every open bug ranked
-         (security first, then severity, then clients affected) with its lane and slot, then every feature by
-         version. A payment or security bug is always handled before a display bug. When a human says a fix is
-         live, run `python3 tools/priorities.py done <id>`.
+         (security first, then severity, then clients affected), then the DELIVERABLES: which version ships
+         which bugs or features, and when. A payment or security bug is always handled before a display bug.
+         Ask the Fixer for one fix per bug, in PLAN order. When a human says a fix is merged and live, run
+         `python3 tools/priorities.py done <id>` and post the version it shipped in and the updated PLAN.
       5. After each human decision, append one line to DECISIONS.md: date | id | decision | by | why.
       You never deploy.
 group:

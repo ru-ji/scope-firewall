@@ -3,11 +3,13 @@
 Usage:
   priorities.py add <id> <verdict> <severity> <security yes|no> "<title>" [affected clients]
   priorities.py done <id>
-  priorities.py plan [current hour]          ranked plan: bugs by priority, then features by version
+  priorities.py plan [current hour]     ranked bugs, then the deliverables: releases with their contents
 
 Rank: security holes first, then severity (critical > high > medium > low), then clients affected, then oldest.
-Plan: hotfix lane -> now, in rank order; patch lane -> next quiet window (plan_window.py), in rank order;
-features -> VERSIONS.md change requests, accepted first, then quote-sent, then proposed; smaller effort first.
+Deliverables: every hotfix-lane bug ships in the next patch version, now; every patch-lane bug ships in the
+version after it, in the next quiet window (plan_window.py); features ship in the version VERSIONS.md gives them
+(accepted first, then quote-sent, then proposed; smaller effort first). Versions count up from the last delivered
+version in VERSIONS.md and from the releases already shipped (bugs marked done).
 """
 import csv, os, re, sys
 
@@ -17,7 +19,7 @@ from triage_lane import SEVERITIES, lane
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 QUEUE, VERSIONS, TRAFFIC = (os.path.join(ROOT, f) for f in ("QUEUE.md", "VERSIONS.md", "data/traffic.csv"))
-COLS = ["Id", "Title", "Verdict", "Severity", "Security", "Affected", "Order", "Status"]
+COLS = ["Id", "Title", "Verdict", "Severity", "Security", "Affected", "Order", "Status", "Release"]
 HEADER = ("# QUEUE: open bugs, ranked\n\nWritten by `tools/priorities.py`. Rank: security first, then severity, then clients "
           "affected, then oldest.\n\n| " + " | ".join(COLS) + " |\n|" + " --- |" * len(COLS) + "\n")
 
@@ -52,18 +54,21 @@ def add(bid, verdict, severity, security, title, affected="0", path=QUEUE):
     rows = [r for r in load(path) if r["Id"] != bid]
     order = max([int(r["Order"]) for r in load(path)] or [0]) + 1
     rows.append({"Id": bid, "Title": title, "Verdict": verdict, "Severity": severity, "Security": security,
-                 "Affected": str(affected), "Order": str(order), "Status": "open"})
+                 "Affected": str(affected), "Order": str(order), "Status": "open", "Release": "-"})
     save(rows, path)
 
 
-def done(bid, path=QUEUE):
+def done(bid, path=QUEUE, versions=VERSIONS, traffic=TRAFFIC):
     rows = load(path)
-    if bid not in [r["Id"] for r in rows]:
-        raise SystemExit(f"{bid} not in the queue")
+    if bid not in [r["Id"] for r in rows if r["Status"] == "open"]:
+        raise SystemExit(f"{bid} is not an open bug in the queue")
+    shipped_in = next(rel["version"] for rel in make_plan(rows, versions=versions, traffic=traffic)["releases"]
+                      if bid in rel["items"])
     for r in rows:
         if r["Id"] == bid:
-            r["Status"] = "done"
+            r["Status"], r["Release"] = "done", shipped_in
     save(rows, path)
+    return shipped_in
 
 
 def ranked(rows):
@@ -84,13 +89,34 @@ def features(path=VERSIONS):
     return sorted(out, key=lambda f: (f["version"], status_rank[f["status"]], "SML".index(f["effort"]), f["id"]))
 
 
+def base_version(rows, versions=VERSIONS):
+    """Last delivered minor (e.g. v1.0) and the highest patch number already shipped on it."""
+    delivered = [l.split("|")[1].strip() for l in open(versions)
+                 if l.startswith("| v") and l.rstrip().endswith("| delivered |")] if os.path.exists(versions) else []
+    minor = max(delivered or ["v1.0"], key=lambda v: tuple(int(x) for x in v[1:].split(".")))
+    shipped = [int(r["Release"].rsplit(".", 1)[1]) for r in rows
+               if r["Status"] == "done" and r["Release"].startswith(minor + ".")]
+    return minor, max(shipped or [0])
+
+
 def make_plan(rows, now=14, versions=VERSIONS, traffic=TRAFFIC):
     quiet = window(list(csv.DictReader(open(traffic))), "minor", now)["when"]
     bugs = []
     for rank, r in enumerate(ranked(rows), 1):
         l = lane("defect", r["Severity"], r["Security"] == "yes")["lane"]
         bugs.append({"rank": rank, **r, "lane": l, "slot": "now" if l == "hotfix" else f"quiet window {quiet}"})
-    return {"bugs": bugs, "features": features(versions)}
+    minor, patch = base_version(rows, versions)
+    releases = []
+    for l, when in (("hotfix", "now"), ("patch", f"quiet window {quiet}")):
+        items = [b["Id"] for b in bugs if b["lane"] == l]
+        if items:
+            patch += 1
+            releases.append({"version": f"{minor}.{patch}", "kind": l, "when": when, "items": items})
+    feats = features(versions)
+    for v in dict.fromkeys(f["version"] for f in feats):
+        releases.append({"version": v, "kind": "features", "when": "after written client approval",
+                         "items": [f["id"] for f in feats if f["version"] == v]})
+    return {"bugs": bugs, "features": feats, "releases": releases}
 
 
 def render(p):
@@ -100,11 +126,14 @@ def render(p):
         out.append(f"{b['rank']}. {b['Id']} [{b['Severity']}{sec}] {b['Title']} -> {b['lane']} {b['slot']}")
     if not p["bugs"]:
         out.append("(no open bug)")
-    out.append("FEATURES, by version")
-    for f in p["features"]:
-        out.append(f"{f['version']} {f['id']} [{f['status']}, effort {f['effort']}] {f['request']}")
-    if not p["features"]:
-        out.append("(no change request)")
+    out.append("DELIVERABLES")
+    feats = {f["id"]: f for f in p["features"]}
+    for rel in p["releases"]:
+        names = ", ".join(i if i not in feats else f"{i} {feats[i]['request']} [{feats[i]['status']}, effort {feats[i]['effort']}]"
+                          for i in rel["items"])
+        out.append(f"{rel['version']} {rel['kind']}, {rel['when']}: {names}")
+    if not p["releases"]:
+        out.append("(nothing planned)")
     return "\n".join(out)
 
 
@@ -114,7 +143,7 @@ if __name__ == "__main__":
         add(*a[1:])
         print(render(make_plan(load())))
     elif a[:1] == ["done"] and len(a) == 2:
-        done(a[1])
+        print(f"{a[1]} shipped in {done(a[1])}")
         print(render(make_plan(load())))
     elif a[:1] == ["plan"] and len(a) in (1, 2):
         print(render(make_plan(load(), *(int(x) for x in a[1:2]))))
