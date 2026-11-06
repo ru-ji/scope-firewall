@@ -5,7 +5,8 @@ Usage:
   contract.py verdict <rule-id|none> [target]
       rule violated -> defect, rule holds -> usage, no rule (none) -> out_of_scope
 target: --local (default) drives the app's own HTTP handler in-process, with no network, so it works inside
-        any agent sandbox; or a base URL (e.g. http://localhost:8080) for a real HTTP run (used by CI).
+        any agent sandbox; --local=<path> does the same for another app file (the tests use a frozen copy of
+        the shipped app); or a base URL (e.g. http://localhost:8080) for a real HTTP run (used by CI).
 """
 import importlib.util, io, json, os, sys, urllib.error, urllib.request
 
@@ -28,21 +29,21 @@ class _Sock:
         pass
 
 
-_handler = None
+_handlers = {}
 
 
-def _post_local(body):
-    global _handler
-    if _handler is None:
-        spec = importlib.util.spec_from_file_location("scope_app", os.path.join(ROOT, SCOPE["app"]))
+def _post_local(body, app=None):
+    app = os.path.join(ROOT, app or SCOPE["app"])
+    if app not in _handlers:
+        spec = importlib.util.spec_from_file_location(f"scope_app_{len(_handlers)}", app)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        _handler = type("Quiet", (mod.H,), {"log_message": lambda *a: None})
+        _handlers[app] = type("Quiet", (mod.H,), {"log_message": lambda *a: None})
     data = json.dumps(body).encode()
     raw = (f"POST {SCOPE['endpoint']} HTTP/1.1\r\nHost: local\r\nContent-Type: application/json\r\n"
            f"Content-Length: {len(data)}\r\n\r\n").encode() + data
     sock = _Sock(raw)
-    _handler(sock, ("local", 0), None)
+    _handlers[app](sock, ("local", 0), None)
     head, _, payload = sock.out.getvalue().partition(b"\r\n\r\n")
     return int(head.split()[1]), payload.decode()
 
@@ -58,7 +59,9 @@ def _post_http(base, body):
 
 
 def post(target, body):
-    return _post_local(body) if target == "--local" else _post_http(target, body)
+    if target.startswith("--local"):
+        return _post_local(body, target.partition("=")[2] or None)
+    return _post_http(target, body)
 
 
 def run(target="--local", rule=None):

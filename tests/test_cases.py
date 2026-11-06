@@ -2,8 +2,8 @@
 import json, sys, threading
 from http.server import HTTPServer
 
-sys.path[:0] = ["tools", "demo-app"]
-import app
+sys.path[:0] = ["tools", "tests/fixtures"]
+import shipped_app as app  # frozen copy of the shipped app, so fixing demo-app/ never breaks these tests
 from contract import verdict
 from triage_lane import lane
 
@@ -24,7 +24,7 @@ for c in cases:
         v = verdict(c["rule"], url)
         assert v["verdict"] == c["expected_verdict"], (c["id"], v["verdict"])
         assert v["security"] == c["security"], (c["id"], "security flag must come from the contract")
-        assert verdict(c["rule"])["verdict"] == v["verdict"], (c["id"], "--local and HTTP must agree")
+        assert verdict(c["rule"], "--local=tests/fixtures/shipped_app.py")["verdict"] == v["verdict"], (c["id"], "--local and HTTP must agree")
     got = lane(c["expected_verdict"], c["severity"], c["security"])["lane"]
     assert got == c["expected_lane"], (c["id"], got)
 
