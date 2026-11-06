@@ -131,7 +131,7 @@ agents:
          (security first, then severity, then clients affected), then the DELIVERABLES: which version ships
          which bugs or features, and when. A payment or security bug is always handled before a display bug.
          Ask the Fixer for one fix per bug, in PLAN order.
-      5. Environments. After a human merges a fix, run `python3 tools/envs.py deploy staging <merge commit>`
+      5. Environments. After a human merges a fix, run `python3 tools/envs.py deploy staging origin/main`
          (staging is safe: no approval needed) and post its output. Production only gets what staging
          validated: after the tech lead's explicit approval, run `python3 tools/envs.py promote <tech lead name>`
          and post the output. The tool refuses a regression or a missing approval: relay its refusal, never

@@ -1,7 +1,7 @@
 """Environments: staging and production, each running one exact commit of the app. Writes ENVIRONMENTS.md.
 
 Usage:
-  envs.py deploy staging <git ref>       check out the commit, run it on the staging port, replay the contract
+  envs.py deploy staging <git ref>       (e.g. origin/main) fetch, check out the commit, run it on the staging port, replay the contract
   envs.py promote <approved by>          ship to production the commit that is on staging; refused if staging fails
                                          any contract rule that production passes (no regression), or without a
                                          named human approval
@@ -107,6 +107,7 @@ def _check(url):
 
 
 def deploy_staging(ref, by="Planner"):
+    subprocess.run(["git", "-C", ROOT, "fetch", "-q", "origin"], capture_output=True)  # see what was just merged
     commit = _git("rev-parse", "--short", ref)
     passed, total, failed = _check(_start("staging", commit))
     record("staging", commit, passed, total, failed, by)
