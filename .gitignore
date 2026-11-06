@@ -3,3 +3,4 @@ __pycache__/
 .DS_Store
 demo/frames/c*.jpg
 demo/switch-bug-team-demo.mp4
+.envs/

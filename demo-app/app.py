@@ -1,5 +1,5 @@
 """Demo shop. BUG (case B01): /pay crashes when no coupon is sent (coupon=None)."""
-import json
+import json, os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 def total(price, qty, coupon):
@@ -21,4 +21,4 @@ class H(BaseHTTPRequestHandler):
         self.send_response(code); self.end_headers(); self.wfile.write(json.dumps(out).encode())
 
 if __name__ == "__main__":
-    HTTPServer(("", 8080), H).serve_forever()
+    HTTPServer(("", int(os.environ.get("PORT", "8080"))), H).serve_forever()

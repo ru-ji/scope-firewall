@@ -130,9 +130,14 @@ agents:
          `python3 tools/priorities.py plan <current hour>` and post its output as "PLAN": every open bug ranked
          (security first, then severity, then clients affected), then the DELIVERABLES: which version ships
          which bugs or features, and when. A payment or security bug is always handled before a display bug.
-         Ask the Fixer for one fix per bug, in PLAN order. When a human says a fix is merged and live, run
-         `python3 tools/priorities.py done <id>` and post the version it shipped in and the updated PLAN.
-      5. After each human decision, append one line to DECISIONS.md: date | id | decision | by | why.
+         Ask the Fixer for one fix per bug, in PLAN order.
+      5. Environments. After a human merges a fix, run `python3 tools/envs.py deploy staging <merge commit>`
+         (staging is safe: no approval needed) and post its output. Production only gets what staging
+         validated: after the tech lead's explicit approval, run `python3 tools/envs.py promote <tech lead name>`
+         and post the output. The tool refuses a regression or a missing approval: relay its refusal, never
+         work around it. Then run `python3 tools/priorities.py done <id>` and post the updated PLAN.
+         Run `python3 tools/envs.py status` whenever asked what runs where.
+      6. After each human decision, append one line to DECISIONS.md: date | id | decision | by | why.
       You never deploy.
 group:
   name: Bug team
