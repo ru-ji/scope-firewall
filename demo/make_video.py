@@ -50,7 +50,6 @@ def term(kicker, caption, blocks, secs, source):
                 col = OK if w.startswith(("PASS", " \"result\": \"AGREE")) else BAD if w.startswith(("FAIL", " \"result\": \"DISAGREE")) else FG
                 d.text((100, y), w, font=m(25), fill=col); y += 34
         y += 18
-    d.text((80, H - 50), f"Real output, saved in demo/live/{source}", font=f(22), fill=DIM)
     save(im, secs)
 
 
@@ -70,7 +69,7 @@ def shot(kicker, caption, frame, secs):
     h = H - y - 70
     s = s.resize((int(s.width * h / s.height), h), Image.LANCZOS)
     im.paste(s, ((W - s.width) // 2, y + 14))
-    d.text((80, H - 44), "Real screenshot: Discord server bridged by Switch. Verifier/Reception/Planner on Claude Code, contradictor on Codex (GPT).",
+    d.text((80, H - 44), "Discord, bridged by Switch · Reception, Verifier, Fixer, Planner on Claude Code · contradictor on Codex (GPT)",
            font=f(22), fill=DIM)
     save(im, secs)
 
@@ -87,14 +86,14 @@ card("THE TEAM IN SWITCH", "4 rooms, 5 agents, 2 providers",
       "#verification: Verifier on Claude Code. #second-opinion: contradictor on Codex (GPT), alone, blind.",
       "#release: Planner compares both verdicts, picks the lane, writes the change request.",
       "No agent deploys, merges, or messages a client."], 10)
-term("THE CONTRACT IS EXECUTABLE", "SCOPE.md is backed by scope.json. One command runs every rule against the shipped app. Verdicts come from this output, never from model opinion.",
+term("THE CONTRACT IS EXECUTABLE", "The signed scope is executable: every rule runs against the production app. Verdicts come from this, never from a model's opinion.",
      [("$ python3 tools/contract.py check", live("contract_shipped.txt"))], 8, "contract_shipped.txt")
 shot("CASE B01 · #client-intake", "A teammate pastes the client's WhatsApp message. Reception (no repo access) restates it, asks the missing questions, drafts the reply a human sends, and writes the sheet: bug, urgent.", "01_b01_reception.jpg", 9)
 shot("CASE B01 · #verification · CLAUDE CODE", "The Verifier maps the report to rule F2, runs the contract (no coupon -> 500), recounts the log with grep (51 errors, all after the 09:40 deploy) and ends with one VERDICT line.", "02_b01_verifier.jpg", 9)
 shot("CASE B01 · #second-opinion · CODEX", "Same sheet, blind, alone in its own room, on another provider. The contradictor runs the contract itself and reaches the same VERDICT line.", "03_b01_contradictor.jpg", 8)
-shot("CASE B01 · #release", "The Planner compares both lines (AGREE), gets the hotfix lane from the triage script, and will not go further without the tech lead's explicit approval.", "04_b01_planner_hotfix.jpg", 8)
-shot("CASE B01 · THE FIXER OPENS A PR", "On the confirmed verdict, the Fixer branches fix/B01, changes demo-app only, proves it with the contract (8/8 PASS) and opens a real pull request.", "05_b01_fixer_pr.jpg", 9)
-term("CASE B01 · CI GATES THE MERGE", "GitHub Actions re-runs the tests and the contract over real HTTP on the PR. The shipped app on main fails the contract; the PR passes every check.",
+shot("CASE B01 · #release", "The Planner compares both lines (AGREE), puts it in the hotfix lane, and will not go further without the tech lead's explicit approval.", "04_b01_planner_hotfix.jpg", 8)
+shot("CASE B01 · THE FIXER OPENS A PR", "On the confirmed verdict, the Fixer branches fix/B01, changes the app only, proves it against the contract (8/8 PASS) and opens a pull request.", "05_b01_fixer_pr.jpg", 9)
+term("CASE B01 · CI GATES THE MERGE", "GitHub Actions re-checks the contract on the pull request. Production fails it; the fix passes every check, then a human merges.",
      [("$ gh pr view 1", live("pr1_view.txt")), ("$ gh pr checks 1", live("pr1_checks.txt")), ("$ gh run list --branch main", live("main_ci.txt"))], 9, "pr1_view.txt, pr1_checks.txt, main_ci.txt")
 shot("CASE B01 · HUMAN IN THE LOOP", "The tech lead approves with a rollback plan. The Planner logs it in DECISIONS.md and hands the merge and the deploy to a human: no agent can ship.", "06_b01_approved.jpg", 8)
 shot("CASE B04 · A CHANGE REQUEST DISGUISED AS A BUG", "\"We need a PDF export of our orders for accounting.\" Reception classifies it as a change request, not a bug, and drafts a scoping reply.", "07_b04_reception.jpg", 8)
@@ -102,10 +101,10 @@ shot("CASES B03 + B05 · #client-intake", "B03: \"I think I typed my coupon wron
 shot("B04 + B03 · #verification · CLAUDE CODE", "B04: no rule in the signed SCOPE.md, out_of_scope. B03: rule F3 says coupon > 1 must get a 422, the app charged 200. Not the client's mistake: our defect.", "09_b04_b03_verifier.jpg", 9)
 shot("B04 + B03 · #second-opinion · CODEX", "The other provider, blind, reaches the same two verdicts: \"the client's acknowledged typo still requires rejection under the contract\".", "10_b04_b03_contradictor.jpg", 8)
 shot("B04 + B03 · #release", "B04 goes to the backlog as CR-001 with an effort estimate and a quote: billed, never free, MVP unchanged. B03 becomes a patch at 03:30, when traffic is lowest, so users are never blocked.", "11_b04_b03_release.jpg", 10)
-card("WHY IT HOLDS", "Facts are scripts. Judgment is cross-checked.",
-     ["contract.py: verdicts. compare.py: agreement. triage_lane.py: exit. plan_window.py: when. versions.py: billing.",
-      "Two providers in separate Switch rooms agreed on every case. Every merge, deploy and client message stays with a human.",
-      "Reproduce: docker compose up, then for t in tests/test_*.py; do python3 $t; done"], 9)
+card("SCOPE FIREWALL", "Free work or paid work, settled in the chat.",
+     ["Every verdict is checked against the signed contract by two AI providers that never see each other.",
+      "Real bugs get fixed fast without blocking users. Change requests get a quote instead of free work.",
+      "Every merge, deploy and client message stays with a human."], 9)
 
 lst = os.path.join(OUT, "list.txt")
 with open(lst, "w") as fh:
