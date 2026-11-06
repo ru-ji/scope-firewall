@@ -3,13 +3,19 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 def total(price, qty, coupon):
-    return price * qty * coupon  # BUG: coupon None -> TypeError; should default to 1
+    if coupon is None:
+        coupon = 1  # F2: missing/null coupon means no discount
+    if not 0 < coupon <= 1:
+        raise ValueError("coupon must be in (0, 1]")  # F3/F4
+    return price * qty * coupon
 
 class H(BaseHTTPRequestHandler):
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}")
         try:
             out, code = {"total": total(body["price"], body["qty"], body.get("coupon"))}, 200
+        except ValueError as e:
+            out, code = {"error": str(e)}, 422
         except Exception as e:
             out, code = {"error": repr(e)}, 500
         self.send_response(code); self.end_headers(); self.wfile.write(json.dumps(out).encode())
