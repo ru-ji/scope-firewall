@@ -2,6 +2,7 @@
 
 Usage:
   contract.py check [target]                  all rules; exit 1 if any check fails
+  contract.py regress <base app.py> <head app.py>   exit 1 if a rule passing on base fails on head
   contract.py verdict <rule-id|none> [target]
       rule violated -> defect, rule holds -> usage, no rule (none) -> out_of_scope
 target: --local (default) drives the app's own HTTP handler in-process, with no network, so it works inside
@@ -97,6 +98,16 @@ def verdict(rule, target="--local"):
             "passed": [c["check"] for c in checks if c["pass"]]}
 
 
+def regress(base_app, head_app):
+    """Regression gate: rules that pass on the base app must still pass on the head app."""
+    base = {(c["rule"], c["check"]): c["pass"] for c in run("--local=" + base_app)}
+    head = {(c["rule"], c["check"]): c["pass"] for c in run("--local=" + head_app)}
+    regressions = sorted(f"{r} {n}" for (r, n), ok in base.items() if ok and not head.get((r, n), False))
+    fixed = sorted(f"{r} {n}" for (r, n), ok in head.items() if ok and not base.get((r, n), True))
+    still_open = sorted(f"{r} {n}" for (r, n), ok in head.items() if not ok)
+    return {"regressions": regressions, "fixed": fixed, "still_open": still_open}
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     if a[:1] == ["check"]:
@@ -104,6 +115,12 @@ if __name__ == "__main__":
         for c in res:
             print(f"{'PASS' if c['pass'] else 'FAIL'}  {c['rule']}  {c['check']}  -> {c['observed']['status']} {c['observed']['body']}")
         sys.exit(0 if all(c["pass"] for c in res) else 1)
+    if a[:1] == ["regress"] and len(a) == 3:
+        r = regress(a[1], a[2])
+        print(f"fixed: {', '.join(r['fixed']) or 'nothing'}")
+        print(f"still open (not this change's job): {', '.join(r['still_open']) or 'none'}")
+        print(f"regressions: {', '.join(r['regressions']) or 'none'}")
+        sys.exit(1 if r["regressions"] else 0)
     if a[:1] == ["verdict"] and len(a) >= 2:
         print(json.dumps(verdict(a[1], *a[2:3]), indent=1))
         sys.exit(0)

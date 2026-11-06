@@ -49,5 +49,20 @@ assert verdict("none", url)["verdict"] == "out_of_scope"
 assert all(c["pass"] for c in run(good_url)), [c for c in run(good_url) if not c["pass"]]
 assert all(verdict(r, good_url)["verdict"] == "usage" and not verdict(r, good_url)["security"] for r in ("F2", "F3", "F4", "F5", "F6"))
 
+# Regression gate: a hotfix may leave other bugs open, but nothing that passed may fail.
+import tempfile
+from contract import regress
+src = open("tests/fixtures/shipped_app.py").read()
+d = tempfile.mkdtemp()
+fix_f6 = (src.replace("    return price * qty * coupon", "    if not (isinstance(qty, int) and qty >= 1):\n        raise ValueError('qty')\n    return price * qty * coupon")
+          .replace("        except Exception as e:", "        except ValueError as e:\n            out, code = {'error': str(e)}, 422\n        except Exception as e:"))
+break_f1 = src.replace("    return price * qty * coupon", "    return price * qty * coupon * 2")
+for name, body in (("fix_f6.py", fix_f6), ("break_f1.py", break_f1)):
+    open(f"{d}/{name}", "w").write(body)
+r = regress("tests/fixtures/shipped_app.py", f"{d}/fix_f6.py")
+assert r["regressions"] == [] and any(x.startswith("F6") for x in r["fixed"]) and any(x.startswith("F5") for x in r["still_open"]), r
+r = regress("tests/fixtures/shipped_app.py", f"{d}/break_f1.py")
+assert any(x.startswith("F1") for x in r["regressions"]), r
+
 demo.shutdown(); good.shutdown()
 print("ok")

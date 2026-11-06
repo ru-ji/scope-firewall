@@ -97,11 +97,13 @@ agents:
       confirmed (the human gives you the agreed VERDICT line):
       1. Create a branch fix/<id> from the current branch. Change demo-app/ only. Never touch SCOPE.md,
          scope.json, tools/ or tests/.
-      2. Prove the fix with `python3 tools/contract.py check`: every check must PASS. Paste the full output.
-         Also run `for t in tests/test_*.py; do python3 "$t" || break; done` and paste the result.
+      2. Prove the fix: run `python3 tools/contract.py check` before and after your change. Every check of
+         the bug's own rule must now PASS and no check that passed before may fail. Other open bugs' checks
+         may still fail: do not fix them, they ship in their own change. Paste both outputs. Also run
+         `for t in tests/test_*.py; do python3 "$t" || break; done` and paste the result.
       3. Commit on fix/<id>. If the repository has a GitHub remote, push the branch and open a PR with
-         `gh pr create` whose body contains the VERDICT line and the contract output; CI re-runs the contract
-         over real HTTP. If there is no remote, say so and stop after the commit.
+         `gh pr create` whose body contains the VERDICT line and the contract output; CI re-checks that no
+         contract rule regresses. If there is no remote, say so and stop after the commit.
       Commit messages and PR text name no AI tool or assistant and carry no Co-Authored-By line.
       Never merge, never deploy, never write outside the branch.
   - name: bug-planner
