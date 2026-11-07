@@ -15,7 +15,7 @@ A few things make it more than a chatbot in a channel. Rooms decide who sees wha
 
 ## How I came to it
 
-I discovered Switch through the Flip the Switch Hackathon and entered the Best Business Workflow track. I wanted to test it on a problem I know well from client work: a client sends one message that mixes a bug report with a new feature request, and the team loses time working out what each part is and where it should go.
+I discovered Switch through the Flip the Switch Hackathon and entered the Best Business Workflow track. I wanted to test it on a problem I know well from client work: everything that happens between a client's message and a shipped fix. Someone has to understand the request, check whether it is really a bug, estimate it, plan a date, fix it, test it, deploy it and keep the client informed. That coordination happens in the team chat anyway, by hand, and it is where delays and mistakes creep in. A single message like "a customer got a free order, and could you add a PDF export?" already needs all of it.
 
 ## What I built with it
 
