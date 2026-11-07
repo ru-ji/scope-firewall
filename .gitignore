@@ -4,3 +4,7 @@ __pycache__/
 demo/frames/c*.jpg
 .envs/
 .worktrees/
+.env
+demo/voice/
+demo/raw/
+demo/demo.mp4

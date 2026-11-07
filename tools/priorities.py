@@ -4,7 +4,8 @@ Usage:
   priorities.py add <id> <verdict> <severity> <security yes|no> "<title>" [affected clients]
   priorities.py done <id>
   priorities.py plan [current hour]     ranked bugs, then the deliverables: releases with their contents
-  priorities.py client [current hour]   draft update for the client: included in the contract, billed, waiting for them
+  priorities.py client [current hour]   draft update for the client: included in the contract, billed, waiting for them,
+                                        and every target date with its delays (schedule.py)
 
 Rank: security holes first, then severity (critical > high > medium > low), then clients affected, then oldest.
 Deliverables: every hotfix-lane bug ships in the next patch version, now; every patch-lane bug ships in the
@@ -161,7 +162,7 @@ def render(p):
     return "\n".join(out)
 
 
-def client_note(p):
+def client_note(p, dates=()):
     """What the client needs to know, in their words: a draft a human reads and sends."""
     titles = {b["Id"]: b["Title"] for b in p["bugs"]}
     free = [f"- {r['version']}, {r['when']}: {', '.join(titles[i] for i in r['items'])}" for r in p["releases"]
@@ -171,7 +172,8 @@ def client_note(p):
     waiting = [f"- {f['version']}: {f['request']} (quote {f['id']})" for f in p["features"] if f["status"] != "accepted"]
     return "\n".join(["DRAFT client update (a human sends it)", "Included in your contract, no extra cost:", *(free or ["- nothing open"]),
                       "Outside the contract, billed separately:", *(billed or ["- nothing accepted"]),
-                      "Waiting for your written approval:", *(waiting or ["- nothing"])])
+                      "Waiting for your written approval:", *(waiting or ["- nothing"]),
+                      *(["Dates (a delay always comes with its reason):", *dates] if dates else [])])
 
 
 if __name__ == "__main__":
@@ -183,7 +185,8 @@ if __name__ == "__main__":
         print(f"{a[1]} shipped in {done(a[1])}")
         print(render(make_plan(load())))
     elif a[:1] == ["client"] and len(a) in (1, 2):
-        print(client_note(make_plan(load(), *(int(x) for x in a[1:2]))))
+        import schedule
+        print(client_note(make_plan(load(), *(int(x) for x in a[1:2])), schedule.lines(schedule.delivered_now())))
     elif a[:1] == ["plan"] and len(a) in (1, 2):
         print(render(make_plan(load(), *(int(x) for x in a[1:2]))))
     else:

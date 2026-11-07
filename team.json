@@ -1,0 +1,9 @@
+{
+  "members": {
+    "asher": ["project-manager", "tech-lead"],
+    "dev": ["developer"],
+    "client": ["client"]
+  },
+  "workdays": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+  "holidays": ["2026-11-11", "2026-12-25", "2027-01-01"]
+}

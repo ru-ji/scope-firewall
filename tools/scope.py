@@ -17,6 +17,9 @@ Once frozen, the contract only changes through `amend`, never by hand.
 """
 import datetime, json, os, re, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from roles import require
+
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 SCOPE_JSON = os.environ.get("SCOPE_FILE") or os.path.join(ROOT, "scope.json")
 SCOPE_MD = os.path.join(os.path.dirname(SCOPE_JSON), "SCOPE.md")
@@ -140,9 +143,11 @@ def new(replace_signed=False, today=None):
     for name in ("QUEUE.md", "ENVIRONMENTS.md", "DECISIONS.md"):
         _clear(os.path.join(base, name))
     _clear(VERSIONS_MD, "| v1.0 | MVP | signed contract | every rule of SCOPE.md | n/a | see SCOPE.md | accepted |\n")
+    open(os.path.join(base, "schedule.json"), "w").write("{}\n")
 
 
 def sign(draft_path, version, by, today=None):
+    require(by, "project-manager", "client")
     scope = load()
     if scope.get("frozen"):
         raise SystemExit(f"REFUSED: {scope['version']} is already signed and frozen; use `amend` for an accepted change request")
@@ -171,6 +176,7 @@ def accepted_cr(cr_id, path=None):
 
 
 def amend(draft_path, cr_id, by, versions_path=None, today=None):
+    require(by, "project-manager", "client")
     scope = load()
     if not scope.get("frozen"):
         raise SystemExit("REFUSED: nothing to amend, the contract is not signed yet (use `sign`)")

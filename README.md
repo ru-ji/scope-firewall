@@ -12,7 +12,7 @@ Scope Firewall fixes this at the root: the project starts with a signed contract
 | **2. Plan and build** | The plan lists every rule to build; the Fixer builds by PR | `priorities.py plan` | PR review |
 | **3. Client requests** | Paste any message; Reception splits it, one sheet per request | Each request goes on alone | A teammate says `GO` on each sheet |
 | **4. Verification** | Two providers judge each request, blind, in separate rooms | `contract.py`, `compare.py` | A human settles a disagreement |
-| **5. Deliverables** | Fixes ranked, features quoted, releases planned, client update drafted | `triage_lane.py`, `priorities.py`, `versions.py` | Severity confirmed; a human sends everything the client sees |
+| **5. Deliverables** | Fixes ranked, features quoted, releases planned; dates proposed from the work in working days, efforts corrected by a developer, delays logged with their reason; client update drafted | `triage_lane.py`, `priorities.py`, `versions.py`, `schedule.py` | Severity confirmed; the project manager accepts each date and each delay; a human sends everything the client sees |
 | **6. Delivery** | Staging, then production; rollback if needed | `envs.py` | Named approval for production and rollback |
 | **7. Evolution** | An accepted quote amends the contract for the next version | `scope.py amend` | Signature; CI refuses any other change |
 
@@ -70,6 +70,9 @@ Switch is the team's workplace, not a wrapper. The scripts answer questions; onl
 | Does every sample request end where we say? | all of the above, live, including mixed messages | `test_cases.py` |
 | Can this reach production? | `envs.py`: staging first, no regression under today's contract, named approval | `test_envs.py` |
 | Can we go back? | `envs.py rollback`: one release at a time, named approval | `test_envs.py` |
+| When is a version ready? | `schedule.py`: build plus test and confirmation per item, one item at a time, weekends and holidays skipped; the project manager accepts | `test_schedule.py` |
+| Is a version late, and why? | `schedule.py`: every delay with its reason, LATE once the committed date passes | `test_schedule.py` |
+| Who may decide? | `team.json` and `roles.py`: only a developer estimates, only the project manager commits a date or signs, only the tech lead promotes | `test_roles.py` |
 | When to deploy a patch? | `plan_window.py` on hourly traffic | `test_plan.py` |
 | Is a feature kept out of the contract? | `versions.py` quotes it into the next undelivered version | `test_versions.py` |
 | Is a change request really delivered? | `versions.py` refuses while a rule signed for it fails | `test_versions.py` |
@@ -87,6 +90,8 @@ python3 tools/scope.py status                          # the signed contract
 python3 tools/contract.py check                        # F5 fails on purpose: it is the open request R10
 python3 tools/priorities.py plan 14                    # ranked work and deliverables, per version
 python3 tools/priorities.py client 14                  # draft update: free, billed, waiting for the client
+python3 tools/schedule.py propose v1.0 2026-11-09 F2:S F4:M F5:S   # proposed date, working days only
+python3 tools/schedule.py show                         # dates, delays and their reasons, what is late
 python3 tools/compare.py "VERDICT R03 rule=F1 verdict=usage severity=low security=no" \
                          "VERDICT R03 rule=F2 verdict=defect severity=high security=no"   # DISAGREE
 for t in tests/test_*.py; do python3 "$t" || break; done

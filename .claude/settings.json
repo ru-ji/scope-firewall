@@ -1,5 +1,11 @@
 {
   "permissions": {
-    "ask": ["Bash(python3 tools/envs.py promote:*)", "Bash(python3 tools/envs.py rollback:*)"]
+    "ask": [
+      "Bash(python3 tools/envs.py promote:*)",
+      "Bash(python3 tools/envs.py rollback:*)",
+      "Bash(python3 tools/scope.py new:*)",
+      "Bash(python3 tools/scope.py sign:*)",
+      "Bash(python3 tools/scope.py amend:*)"
+    ]
   }
 }
