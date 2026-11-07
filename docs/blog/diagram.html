@@ -2,31 +2,31 @@
 <html><head><meta charset="utf-8"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons@5.0.5/css/framework7-icons.css"><style>
 *{box-sizing:border-box;margin:0}
 html,body{background:transparent}
-body{width:1600px;height:330px;font-family:-apple-system,"SF Pro Text",system-ui,sans-serif;position:relative;overflow:hidden}
+body{width:960px;height:230px;font-family:-apple-system,"SF Pro Text",system-ui,sans-serif;position:relative;overflow:hidden}
 svg{position:absolute;inset:0}
-.pill{position:absolute;transform:translate(-50%,-50%);height:46px;padding:0 22px;border-radius:23px;display:flex;align-items:center;gap:9px;
- font-size:17px;font-weight:600;color:#7479f5;border:2px solid #7479f5;background:rgba(116,121,245,.10);white-space:nowrap;letter-spacing:.01em}
-.pill .f7-icons{font-size:20px}.pill .logo{width:19px;height:19px;background:#7479f5;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center}
-.lab{position:absolute;transform:translate(-50%,-50%);font-size:13px;font-weight:600;color:#8b8f9c}
-.legend{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);display:flex;gap:26px;font-size:14px;font-weight:600;color:#8b8f9c}
-.legend span{display:flex;align-items:center;gap:8px}.legend i{width:12px;height:12px;border-radius:6px}
+.pill,.dot{position:absolute;transform:translate(-50%,-50%);border:2px solid #7479f5;background:rgba(116,121,245,.10);color:#7479f5}
+.pill{height:42px;padding:0 18px;border-radius:21px;display:flex;align-items:center;gap:8px;font-size:18px;font-weight:600;white-space:nowrap}
+.pill .f7-icons{font-size:19px}
+.dot{width:50px;height:50px;border-radius:50%;display:grid;place-items:center}
+.dot span{width:24px;height:24px;background:#7479f5;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center}
+.lab{position:absolute;transform:translate(-50%,-50%);font-size:14px;font-weight:600;color:#8b8f9c}
 </style></head><body>
-<svg width="1600" height="330"></svg><div id="n"></div>
+<svg width="960" height="230"></svg><div id="n"></div>
 <script>
-const N=[["brief",110,50,"logo:discord","Client brief"],["plan",320,50,"agent","Planner"],["dates",510,50,"tool","Dates"],
-["dev",700,50,"person","Developer"],["pm",920,50,"checkmark_seal_fill","Project manager"],
-["msg",110,220,"logo:discord","Client message"],["rec",330,220,"agent","Reception"],
-["ver",540,160,"logo:claude","Claude Code"],["con",540,280,"logo:openai","Codex"],["cmp",750,220,"tool","Compare"],
-["fix",960,160,"tool","Hotfix"],["quote",960,280,"tool","Quote"],["stage",1140,160,"tool","Staging"],
-["lead",1330,160,"checkmark_seal_fill","Tech lead"],["prod",1510,160,"tool","Production"],["upd",1160,280,"person","Client update"]];
-const E=[["brief","plan"],["plan","dates"],["dates","dev"],["dev","pm"],["msg","rec"],["rec","ver"],["rec","con"],
-["ver","cmp"],["con","cmp"],["cmp","fix","defect"],["cmp","quote","feature"],["fix","stage"],["stage","lead"],["lead","prod"],["quote","upd"]];
+// id, x, y, kind (logo:name | f7 icon | ""), label
+const N=[["msg",32,115,"logo:discord",""],["rec",160,115,"","Reception"],
+["ver",285,55,"logo:claude",""],["con",285,175,"logo:openai",""],["cmp",405,115,"","Compare"],
+["fix",545,55,"","Hotfix"],["lead",700,55,"checkmark_seal_fill","Tech lead"],["prod",885,55,"","Production"],
+["quote",545,175,"","Quote"],["upd",700,175,"","Client update"]];
+const E=[["msg","rec"],["rec","ver"],["rec","con"],["ver","cmp"],["con","cmp"],["cmp","fix","defect"],["cmp","quote","feature"],
+["fix","lead"],["lead","prod"],["quote","upd"]];
 const P={},n=document.getElementById("n"),svg=document.querySelector("svg");
-for(const [id,x,y,k,t] of N){P[id]=[x,y];const ic=k.startsWith("logo:")?`<span class="logo" style="-webkit-mask-image:url(https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/${k.slice(5)}.svg)"></span>`:k.includes("_")?`<i class="f7-icons">${k}</i>`:"";
- n.insertAdjacentHTML("beforeend",`<div class="pill" id="${id}" style="left:${x}px;top:${y}px">${ic}${t}</div>`);}
+for(const [id,x,y,k,t] of N){P[id]=[x,y];
+ if(k.startsWith("logo:")) n.insertAdjacentHTML("beforeend",`<div class="dot" id="${id}" style="left:${x}px;top:${y}px"><span style="-webkit-mask-image:url(https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/${k.slice(5)}.svg)"></span></div>`);
+ else n.insertAdjacentHTML("beforeend",`<div class="pill" id="${id}" style="left:${x}px;top:${y}px">${k?`<i class="f7-icons">${k}</i>`:""}${t}</div>`);}
 const W=id=>document.getElementById(id).offsetWidth/2;
-window.addEventListener("load",()=>setTimeout(()=>{for(const [a,b,lab] of E){const [x1,y1]=P[a],[x2,y2]=P[b],sx=x1+W(a)+8,ex=x2-W(b)-10,mx=(sx+ex)/2;
+window.addEventListener("load",()=>setTimeout(()=>{for(const [a,b,lab] of E){const [x1,y1]=P[a],[x2,y2]=P[b],sx=x1+W(a)+6,ex=x2-W(b)-8,mx=(sx+ex)/2;
  svg.insertAdjacentHTML("beforeend",`<path d="M${sx} ${y1} C${mx} ${y1} ${mx} ${y2} ${ex} ${y2}" stroke="#8b8f9c" stroke-width="2" fill="none" stroke-linecap="round"/>
  <path d="M${ex-6} ${y2-5} L${ex} ${y2} L${ex-6} ${y2+5}" stroke="#8b8f9c" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`);
- if(lab)n.insertAdjacentHTML("beforeend",`<div class="lab" style="left:${mx-34}px;top:${y2<y1?y2+4:y2-4}px">${lab}</div>`);}},300));
+ if(lab)n.insertAdjacentHTML("beforeend",`<div class="lab" style="left:${mx-30}px;top:${y2<y1?y2+2:y2-2}px">${lab}</div>`);}},300));
 </script></body></html>
