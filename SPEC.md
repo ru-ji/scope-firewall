@@ -38,8 +38,8 @@ Severity: critical = payments fail for most clients; high = a wrong amount is ch
 | Room | Agents | Content |
 | --- | --- | --- |
 | #client-requests | Reception | Pasted client messages, sheets, draft replies. The only room with untrusted text: no agent there has repo access |
-| #verification | Verifier, Fixer | Contract output, VERDICT lines, builds, PRs |
-| #cross-check | Contradictor | The same sheet, blind; the second VERDICT line |
+| #verification | Verifier, Fixer, plus Reception and Planner | Contract output, VERDICT lines, builds, PRs |
+| #cross-check | Contradictor, plus Reception and Planner | The same sheet, blind; the second VERDICT line |
 | #planning | Planner | Kickoff, contract, plan, approvals, change requests, environments |
 
 ## Security
@@ -49,6 +49,8 @@ Severity: critical = payments fail for most clients; high = a wrong amount is ch
 - Agents inherit their owner's access: run them under a dedicated account with access to this repository only.
 - Keep Bypass permissions off. Turn off OpenCode Auto mode, which approves every request.
 - Reception masks passwords, tokens, emails and IPs before anything is posted.
+- Reception hands a sheet over only on a teammate's `GO`, and it has no repo access. The two agents that receive it are read-only.
+- The Planner reads the two verification rooms only to fetch VERDICT lines, and passes nothing between them until both exist.
 - No agent merges, deploys on its own or messages the client.
 
 ## Sources

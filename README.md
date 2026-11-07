@@ -10,7 +10,7 @@ Scope Firewall fixes this at the root: the project starts with a signed contract
 | --- | --- | --- | --- |
 | **1. Kickoff** | Paste the brief; the Planner drafts executable rules | `scope.py sign` | A named person signs |
 | **2. Plan and build** | The plan lists every rule to build; the Fixer builds by PR | `priorities.py plan` | PR review |
-| **3. Client requests** | Paste any message; Reception splits it, one sheet per request | Each request goes on alone | Teammate forwards the sheets |
+| **3. Client requests** | Paste any message; Reception splits it, one sheet per request | Each request goes on alone | A teammate says `GO` on each sheet |
 | **4. Verification** | Two providers judge each request, blind, in separate rooms | `contract.py`, `compare.py` | A human settles a disagreement |
 | **5. Deliverables** | Fixes ranked, features quoted, releases planned, client update drafted | `triage_lane.py`, `priorities.py`, `versions.py` | Severity confirmed; a human sends everything the client sees |
 | **6. Delivery** | Staging, then production; rollback if needed | `envs.py` | Named approval for production and rollback |
@@ -52,7 +52,8 @@ Switch is the team's workplace, not a wrapper. The scripts answer questions; onl
 
 | Switch feature | What it does here | Without it |
 | --- | --- | --- |
-| Rooms and membership | The Contradictor sits alone in `#cross-check` and cannot read the Verifier | The second opinion is no longer blind |
+| Rooms and membership | The Verifier and the Contradictor never share a room, so neither can read the other | The second opinion is no longer blind |
+| Agent hand-off | Reception sends each sheet into both rooms; the Planner reads both verdicts and tells the Fixer what to do | A person copies text between rooms all day |
 | Two providers in one team | Claude Code verifies, Codex (GPT) cross-checks | Both checks share the same blind spots |
 | Addressing rules | Anyone can reach Reception, which has no repo access; the other agents answer only their owner | A client's text could steer an agent that holds the code |
 | Template | `switch/scope-firewall.template.yaml` creates the 5 agents, 4 rooms and their links in one import | Hours of setup for each new client |
@@ -108,9 +109,9 @@ Then run a whole project from the chat:
 | `#planning` | `@scope-planner KICKOFF <client brief>` | Rules drafted and summarised |
 | `#planning` | `@scope-planner I sign, <your name>` | Contract frozen, plan lists what to build |
 | `#verification` | `@scope-fixer BUILD v1.0` | Branch, build, PR |
-| `#client-requests` | `@scope-reception R12: <client message>` | One sheet per request; forward each to `#verification` and `#cross-check` |
-| `#verification`, `#cross-check` | `@scope-verifier <sheet>`, `@scope-contradictor <sheet>` | Two VERDICT lines |
-| `#planning` | `@scope-planner <both VERDICT lines>` | Agreement checked, exit chosen, plan updated |
+| `#client-requests` | `@scope-reception R12: <client message>` | One sheet per request |
+| `#client-requests` | `@scope-reception GO R12a` | Reception hands the sheet to both verification rooms; two VERDICT lines come back |
+| `#planning` | `@scope-planner COMPARE R12a` | The Planner reads both rooms, checks agreement, picks the exit, updates the plan |
 | `#planning` | `@scope-planner client update` | A draft for you to send |
 
 For your own project, replace `demo-app/app.py`: keep the `H` request handler, because `contract.py` drives it in-process and `envs.py` starts that file.
@@ -129,7 +130,7 @@ For your own project, replace `demo-app/app.py`: keep the `H` request handler, b
 ## Limits
 
 - Which rule a message maps to is decided by an LLM: that is why two providers check it and a human settles any disagreement.
-- A human moves sheets and VERDICT lines between rooms. This keeps the rooms separate, and it is manual work.
+- Not yet run end to end in Switch: the `GO` and `COMPARE` hand-offs (built on Switch's `send_targeted_message` and `read_context`) and the approval prompt for production.
 - The sample app is small: six rules, eleven checks. Checks over HTTP work with any app; in-process checks and `envs.py` expect a Python app with an `H` handler.
 - `envs.py` runs both environments as local processes on one machine, on ports 8080 and 8081.
 - The Planner pushes ledgers straight to `main`, so its account needs to bypass branch protection. CI still checks every contract change.
