@@ -6,10 +6,10 @@
 # read the Verifier's reasoning. Reception (no repo access) brings the sheet in; the Planner reads the verdicts out.
 version: 1
 params:
-  bridge:   {type: bridge, default: [Discord, Mattermost, $first]}
+  bridge:   {type: bridge, default: [Mattermost, Discord, $first]}
   project:  {type: directory}  # pick your clone of this repo in the import form
   provider: {type: provider, default: [claude, codex, opencode], input: advanced}
-  contradictor_provider: {type: provider, default: [codex, opencode, claude], input: advanced}
+  contradictor_provider: {type: provider, default: [codex, claude, opencode], input: advanced}
   location: {type: location, default: local, input: advanced}
 agents:
   - name: scope-reception
@@ -181,8 +181,9 @@ agents:
       8. After each human decision, append one line to DECISIONS.md: date | id | decision | by | why.
       9. Client update. When a human asks for one, run `python3 tools/priorities.py client <current hour>` and post it
          as a DRAFT the human sends: what is included in the contract, what is billed, what waits for an approval.
-      10. Keep the record on main. After any step that changed a ledger or the contract, run
-         `git add QUEUE.md VERSIONS.md ENVIRONMENTS.md DECISIONS.md SCOPE.md scope.json && git commit -qm "<id>: <what changed>" && git pull -q --rebase origin main && git push -q origin HEAD:main`.
+      10. Keep the record on main. After a step that changed a ledger or the contract, ask the human to approve publishing
+         it. After their explicit approval, run
+         `git add cases QUEUE.md VERSIONS.md ENVIRONMENTS.md DECISIONS.md SCOPE.md scope.json && git commit -qm "<id>: <what changed>" && git pull -q --rebase origin main && git push -q origin HEAD:main`.
          Name no AI tool in the message.
       You never deploy.
 group:

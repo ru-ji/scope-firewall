@@ -52,7 +52,7 @@ Switch is the team's workplace, not a wrapper. The scripts answer questions; onl
 
 | Switch feature | What it does here | Without it |
 | --- | --- | --- |
-| Rooms and membership | The Verifier and the Contradictor never share a room, so neither can read the other | The second opinion is no longer blind |
+| Rooms and membership | The Verifier and the Contradictor work in separate rooms, so neither can read the other's reasoning | The second opinion is no longer blind |
 | Agent hand-off | Reception sends each sheet into both rooms; the Planner reads both verdicts and tells the Fixer what to do | A person copies text between rooms all day |
 | Two providers in one team | Claude Code verifies, Codex (GPT) cross-checks | Both checks share the same blind spots |
 | Addressing rules | Anyone can reach Reception, which has no repo access; the other agents answer only their owner | A client's text could steer an agent that holds the code |
@@ -130,10 +130,12 @@ For your own project, replace `demo-app/app.py`: keep the `H` request handler, b
 ## Limits
 
 - Which rule a message maps to is decided by an LLM: that is why two providers check it and a human settles any disagreement.
-- Not yet run end to end in Switch: the `GO` and `COMPARE` hand-offs (built on Switch's `send_targeted_message` and `read_context`) and the approval prompt for production.
+- Verified in Switch Console 0.40.1 on Mattermost: template import, the split into R12a and R12b, `GO`, `COMPARE`, severity confirmation, plan, and the ledger push after approval. In that run every agent was on Codex, so the two-provider setup itself was not part of it.
+- Not run in Switch yet: the Allow / Decline prompt for production, which relies on a Claude Code permission rule. `envs.py` always requires a named approval.
+- OpenCode 2.2.0 was refused by Switch Console 0.40.1: its sign-in check could not read the OpenCode server's reply.
 - The sample app is small: six rules, eleven checks. Checks over HTTP work with any app; in-process checks and `envs.py` expect a Python app with an `H` handler.
 - `envs.py` runs both environments as local processes on one machine, on ports 8080 and 8081.
-- The Planner pushes ledgers straight to `main`, so its account needs to bypass branch protection. CI still checks every contract change.
+- The Planner asks for approval, then pushes ledgers straight to `main`, so its account needs to bypass branch protection. CI still checks every contract change.
 - `scope.py new` is trusted in CI through its `replaced` date: a pull request that sets that date is caught by the human review, not by CI.
 - Times, traffic numbers and client messages are sample data.
 
