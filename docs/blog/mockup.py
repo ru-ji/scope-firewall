@@ -1,4 +1,4 @@
-"""Wraps docs/blog/shot*.png in a macOS style window on a soft gradient, and draws the workflow diagram.
+"""Wraps docs/blog/shot*.png in a macOS style window on a soft gradient, (the diagram is diagram.html, rendered with headless Chrome).
 
 Usage: python3 docs/blog/mockup.py   (Pillow). Reads shotN.png, writes shotN_mock.png and diagram.png.
 """
@@ -128,5 +128,3 @@ def diagram():
 if __name__ == "__main__":
     for p in sorted(glob.glob(os.path.join(HERE, "shot[0-9].png"))):
         print(mock(p))
-    diagram()
-    print("diagram.png")
