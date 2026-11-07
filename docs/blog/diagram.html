@@ -1,91 +1,67 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><style>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
 *{box-sizing:border-box;margin:0}
-body{width:1800px;height:820px;font-family:-apple-system,"SF Pro Text",system-ui,sans-serif;position:relative;overflow:hidden;
- background:#f4f4f6;background-image:radial-gradient(#cfd0d8 1.3px,transparent 1.3px);background-size:22px 22px}
-.top{position:absolute;left:40px;top:28px;display:flex;align-items:center;gap:14px}
-.logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#ff6d5a,#ea4b71);display:grid;place-items:center}
-.top h1{font-size:24px;font-weight:700;color:#2b2d3a}
-.top .tag{font-size:13px;color:#7b7e92;background:#fff;border:1px solid #e1e2ea;border-radius:20px;padding:5px 12px}
-.active{position:absolute;right:40px;top:32px;font-size:14px;color:#2b2d3a;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e1e2ea;border-radius:20px;padding:6px 14px}
-.active i{width:30px;height:16px;border-radius:9px;background:#3ecf8e;position:relative}.active i:after{content:"";position:absolute;right:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff}
-.sticky{position:absolute;border-radius:8px;padding:14px 18px;font-size:14px;font-weight:600;color:#5a4a1a}
-.sticky span{display:block;font-weight:400;font-size:13px;opacity:.75;margin-top:3px}
+body{width:1800px;height:760px;font-family:"Open Sans",-apple-system,system-ui,sans-serif;position:relative;overflow:hidden;
+ background-color:#f8f8fc;background-image:linear-gradient(#e9e9f5 1px,transparent 1px),linear-gradient(90deg,#e9e9f5 1px,transparent 1px);background-size:44px 44px}
 svg.edges{position:absolute;inset:0}
-.node{position:absolute;width:92px;height:92px;margin:-46px 0 0 -46px;background:#fff;border:2px solid #d5d6df;border-radius:14px;
- display:grid;place-items:center;box-shadow:0 4px 14px rgba(40,40,70,.10)}
-.node.trigger{border-radius:46px 14px 14px 46px}
-.node svg{width:40px;height:40px}
-.node .badge{position:absolute;top:-10px;right:-10px;font-size:11px;font-weight:700;color:#fff;border-radius:10px;padding:3px 7px}
-.node .port{position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #9a9db0;top:38px}
-.node .in{left:-8px}.node .out{right:-8px}
-.cap{position:absolute;width:170px;margin-left:-85px;text-align:center}
-.cap b{display:block;font-size:15px;color:#2b2d3a;font-weight:650}
-.cap small{display:block;font-size:12.5px;color:#7b7e92;margin-top:3px;line-height:1.3}
-.pill{position:absolute;transform:translate(-50%,-50%);font-size:11.5px;font-weight:600;color:#55586d;background:#fff;border:1px solid #d5d6df;border-radius:12px;padding:3px 9px}
-.legend{position:absolute;left:40px;bottom:26px;display:flex;gap:22px;font-size:13px;color:#55586d}
-.legend span{display:flex;align-items:center;gap:7px}.legend i{width:12px;height:12px;border-radius:4px}
+.node{position:absolute;width:88px;height:88px;margin:-44px 0 0 -44px;background:#fff;border:1.5px dashed;border-radius:18px;display:grid;place-items:center}
+.node.trigger{border-radius:44px 18px 18px 44px}
+.node i.ph-fill{font-size:42px}
+.in{position:absolute;left:-5px;top:35px;width:8px;height:18px;background:#7c7c84;border-radius:2px}
+.out{position:absolute;right:-11px;width:20px;height:20px;border-radius:50%;background:#55555c}
+.cap{position:absolute;width:200px;margin-left:-100px;text-align:center}
+.cap b{display:block;font-size:15.5px;font-weight:500;color:#2d2e36}
+.cap small{display:block;font-size:12px;color:#8a8b94;margin-top:3px}
+.branch{position:absolute;font-size:11px;color:#6b6c75}
+.plus{position:absolute;right:28px;top:22px;width:44px;height:44px;border-radius:50%;background:#ff6d5a;color:#fff;font-size:30px;display:grid;place-items:center;font-weight:300}
+.zoom{position:absolute;left:22px;bottom:22px;display:flex;gap:6px}
+.zoom span{width:34px;height:34px;background:#fff;border-radius:8px;display:grid;place-items:center;color:#55555c;font-size:18px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.run{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:#ff6d5a;color:#fff;font-size:14px;font-weight:600;border-radius:22px;padding:10px 20px;display:flex;align-items:center;gap:8px}
+.title{position:absolute;left:28px;top:24px;font-size:16px;color:#55555c}
+.title b{color:#2d2e36;font-weight:600}
 </style></head><body>
-<div class="top"><div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 12h6l2-5 3 10 2-5h3"/></svg></div>
-<h1>Scope Firewall</h1><div class="tag">Switch template · 5 agents · 4 rooms · Discord</div></div>
-<div class="active"><i></i>Active</div>
-
-<div class="sticky" style="left:40px;top:96px;width:1290px;height:230px;background:#fff6d6;border:1px solid #f3e3a3">1 · Kickoff<span>Brief to signed contract, then a date the project manager accepts</span></div>
-<div class="sticky" style="left:40px;top:356px;width:1720px;height:400px;background:#e9f0ff;border:1px solid #c9d8fb;color:#2a3d7a">2 · Every client message<span>Split, verified blind by two providers, planned, delivered with approvals</span></div>
-
-<svg class="edges" width="1800" height="900"></svg>
+<div class="title"><b>Scope Firewall</b> &nbsp;·&nbsp; client project, from kickoff to delivery</div>
+<div class="plus">+</div>
+<svg class="edges" width="1800" height="760"><defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#3b4256"/></marker></defs></svg>
 <div id="nodes"></div>
-<div class="legend"><span><i style="background:#ff8a3d"></i>a person decides</span><span><i style="background:#6b7bff"></i>an AI agent works</span><span><i style="background:#21b07a"></i>a tested tool checks</span></div>
-
+<div class="zoom"><span><i class="ph-fill ph-magnifying-glass-plus"></i></span><span><i class="ph-fill ph-magnifying-glass-minus"></i></span></div>
+<div class="run"><i class="ph-fill ph-play-circle"></i>Execute Workflow</div>
 <script>
-const C={person:"#ff8a3d",agent:"#6b7bff",tool:"#21b07a"};
-const I={ // lucide style icons
-chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
-file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15l2 2 4-4"/>',
-pen:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
-cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 15h3"/>',
-code:'<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
-check:'<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>',
-split:'<path d="M16 3h5v5M8 3H3v5M12 22v-8.3a4 4 0 0 0-1.2-2.9L3 3M21 3l-7.8 7.8"/>',
-shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
-eye:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>',
-merge:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6M9 6h3a3 3 0 0 1 3 3v0M9 18h3a3 3 0 0 0 3-3"/>',
-zap:'<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
-receipt:'<path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
-server:'<rect x="2" y="3" width="20" height="8" rx="2"/><rect x="2" y="13" width="20" height="8" rx="2"/><path d="M6 7h.01M6 17h.01"/>',
-user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
-rocket:'<path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1z"/><path d="M12 15 9 12a22 22 0 0 1 2-4A13 13 0 0 1 22 2c0 2.7-.8 7.5-6 11a22 22 0 0 1-4 2z"/>',
-mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>'};
-const N=[ // id, x, y, kind, icon, title, sub, trigger, badge
-["brief",130,215,"person","chat","Client brief","pasted in #planning",1],
-["draft",330,215,"agent","file","Planner","drafts executable rules"],
-["sign",530,215,"person","pen","Sign","a named person approves"],
-["dates",730,215,"tool","cal","Propose dates","working days, tests included"],
-["dev",930,215,"person","code","Developer","corrects an estimate"],
-["pm",1130,215,"person","check","Project manager","accepts the date"],
-["msg",130,540,"person","chat","Client message","pasted in #client-requests",1],
-["rec",330,540,"agent","split","Reception","one sheet per request"],
-["ver",540,455,"agent","shield","Verifier","Claude Code, runs contract"],
-["con",540,640,"agent","eye","Contradictor","Codex, blind, other room"],
-["cmp",760,540,"tool","merge","Compare","both verdicts must agree"],
-["fix",980,455,"tool","zap","Hotfix","defect: free, delay proposed"],
-["quote",980,640,"tool","receipt","Quote","feature: billed, next version"],
-["stage",1190,455,"tool","server","Staging","contract checked"],
-["lead",1390,455,"person","user","Tech lead","the only one who promotes"],
-["prod",1590,455,"tool","rocket","Production","Allow or Decline in chat"],
-["upd",1190,640,"person","mail","Client update","every date and its reason"]];
+// id, x, y, icon, color, border, title, parameter, trigger
+const N=[
+["brief",110,170,"discord-logo","#5865F2","#5865F2","Client brief","#planning",1],
+["draft",300,170,"file-text","#6d4aff","#6d4aff","Planner","draft: contract rules"],
+["sign",490,170,"pen-nib","#e8792b","#e8792b","Sign contract","approval: in chat"],
+["dates",680,170,"calendar-check","#1f9d55","#1f9d55","Propose dates","working days + tests"],
+["dev",870,170,"code","#e8792b","#e8792b","Developer","estimate: F5 is M"],
+["pm",1060,170,"seal-check","#e8792b","#e8792b","Project manager","accept: date"],
+["msg",110,440,"discord-logo","#5865F2","#5865F2","Client message","#client-requests",1],
+["rec",300,440,"git-fork","#6d4aff","#6d4aff","Reception","split: one sheet per request"],
+["ver",490,350,"shield-check","#d97757","#d97757","Verifier","Claude Code · contract.py"],
+["con",490,530,"open-ai-logo","#111","#555","Contradictor","Codex · blind room"],
+["cmp",690,440,"signpost","#2e9e3e","#2e9e3e","Compare verdicts","compare.py"],
+["fix",890,350,"lightning","#e5484d","#e5484d","Hotfix","defect: free"],
+["stage",1080,350,"hard-drives","#1f9d55","#1f9d55","Staging","deploy: contract checked"],
+["lead",1270,350,"signpost","#2e9e3e","#2e9e3e","Tech lead?","roles: team.json"],
+["prod",1470,290,"rocket-launch","#1f9d55","#1f9d55","Production","Allow in chat"],
+["hold",1470,440,"hand-palm","#e5484d","#e5484d","Refuse","developer cannot promote"],
+["quote",890,530,"receipt","#1f9d55","#1f9d55","Quote","feature: next version"],
+["upd",1080,530,"paper-plane-tilt","#e8792b","#e8792b","Client update","dates + every reason"]];
 const E=[["brief","draft"],["draft","sign"],["sign","dates"],["dates","dev"],["dev","pm"],
-["msg","rec"],["rec","ver","GO"],["rec","con","GO"],["ver","cmp"],["con","cmp"],["cmp","fix","COMPARE"],["cmp","quote"],
-["fix","stage"],["stage","lead"],["lead","prod","approve"],["quote","upd"]];
-const pos={};const box=document.getElementById("nodes");
-for(const [id,x,y,k,ic,t,s,tr] of N){pos[id]=[x,y];
- box.insertAdjacentHTML("beforeend",`<div class="node ${tr?"trigger":""}" style="left:${x}px;top:${y}px;border-color:${C[k]}55">
- <svg viewBox="0 0 24 24" fill="none" stroke="${C[k]}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${I[ic]}</svg>
- ${tr?"":'<i class="port in"></i>'}<i class="port out"></i></div>
- <div class="cap" style="left:${x}px;top:${y+56}px"><b>${t}</b><small>${s}</small></div>`);}
-const svg=document.querySelector("svg.edges");
-for(const [a,b,label] of E){const [x1,y1]=pos[a],[x2,y2]=pos[b];const sx=x1+52,ex=x2-52,mx=(sx+ex)/2;
- svg.insertAdjacentHTML("beforeend",`<path d="M${sx} ${y1} C${mx} ${y1} ${mx} ${y2} ${ex} ${y2}" stroke="#a3a6b8" stroke-width="2.2" fill="none"/>
- <path d="M${ex-8} ${y2-5} L${ex} ${y2} L${ex-8} ${y2+5}" stroke="#a3a6b8" stroke-width="2.2" fill="none"/>`);
- if(label)box.insertAdjacentHTML("beforeend",`<div class="pill" style="left:${mx}px;top:${(y1+y2)/2}px">${label}</div>`);}
+["msg","rec"],["rec","ver"],["rec","con"],["ver","cmp"],["con","cmp"],["cmp","fix","t"],["cmp","quote","f"],
+["fix","stage"],["stage","lead"],["lead","prod","t"],["lead","hold","f"],["quote","upd"]];
+const P={},box=document.getElementById("nodes"),svg=document.querySelector("svg.edges");
+const ifs=new Set(["cmp","lead"]);
+for(const [id,x,y,ic,col,bd,t,p,tr] of N){P[id]=[x,y];
+ const outs=ifs.has(id)?`<i class="out" style="top:18px"></i><i class="out" style="top:50px"></i>`:`<i class="out" style="top:34px"></i>`;
+ box.insertAdjacentHTML("beforeend",`<div class="node ${tr?"trigger":""}" style="left:${x}px;top:${y}px;border-color:${bd}">
+ <i class="ph-fill ph-${ic}" style="color:${col}"></i>${tr?"":'<i class="in"></i>'}${outs}</div>
+ <div class="cap" style="left:${x}px;top:${y+52}px"><b>${t}</b><small>${p}</small></div>`);
+ if(ifs.has(id))box.insertAdjacentHTML("beforeend",`<div class="branch" style="left:${x+50}px;top:${y-46}px">${id=="cmp"?"defect":"true"}</div>
+ <div class="branch" style="left:${x+50}px;top:${y+30}px">${id=="cmp"?"feature":"false"}</div>`);}
+for(const [a,b,br] of E){const [x1,y1]=P[a],[x2,y2]=P[b];
+ const sy=y1+(br=="t"?-16:br=="f"?16:0),sx=x1+54,ex=x2-50,mx=(sx+ex)/2;
+ svg.insertAdjacentHTML("beforeend",`<path d="M${sx} ${sy} C${mx} ${sy} ${mx} ${y2} ${ex} ${y2}" stroke="#3b4256" stroke-width="2" fill="none" marker-end="url(#a)"/>`);}
 </script></body></html>
