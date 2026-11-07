@@ -56,7 +56,7 @@ def add(request, effort, origin, files, version=None, path=PATH):
     open(path, "a").write(row if text.endswith("\n") else "\n" + row)
     quote = (f"Quote draft {cid} ({version}): \"{_cell(request)}\" is not part of the signed MVP (SCOPE.md). "
              f"Estimated effort {effort} ({EFFORT[effort]}). It will ship in {version} after your written approval, "
-             f"billed separately from the MVP. The MVP delivery date is unchanged.")
+             f"billed separately from the MVP. The MVP scope and price are unchanged; its date only moves with a logged delay.")
     return cid, quote
 
 
