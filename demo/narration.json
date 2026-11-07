@@ -1,12 +1,12 @@
 [
- {"id": "s0_intro", "text": "Client projects lose days when bug reports arrive mixed with new feature requests. Scope Firewall runs a client project from one team chat on Switch, from the signed contract to the next version."},
- {"id": "s1_kickoff", "text": "It starts at kickoff. The Planner turns the client brief into executable rules, asks about what the brief leaves open, and a person signs. Even resetting or signing the contract needs an approval in the room."},
- {"id": "s2_plan", "text": "Once the contract is signed, the plan shows exactly what the developer still has to build."},
- {"id": "s3_split", "text": "Later, the client sends one message with two requests in it: a missing currency, and a PDF export. Reception has no access to the code. It splits the message into two sheets and drafts the questions for the client."},
- {"id": "s4_go", "text": "On GO, Reception hands the sheet to two verifiers in two separate rooms. Claude Code verifies, Codex cross-checks blind. Each one runs the signed contract against the live app."},
- {"id": "s5_compare", "text": "The Planner reads both rooms. They agree: rule F5 fails, so this is our defect, and it is free. A person confirms the severity, and the fix is planned."},
- {"id": "s6_feature", "text": "The PDF export maps to no rule. It becomes a change request with a quote for the next version, and the signed contract stays frozen."},
- {"id": "s7_client", "text": "The client gets one clear update: what is included, what is billed, and what is waiting for their approval."},
- {"id": "s8_delivery", "text": "Delivery goes through staging first. Production needs an explicit approval from the owner, right in the chat."},
- {"id": "s9_outro", "text": "Bugs stay free, features get quoted, and every release is planned. Scope Firewall, built on Switch."}
+ {"id": "s0_intro", "text": "Client projects slip when bug reports arrive mixed with new requests, and when dates are promised without counting the real work. Scope Firewall runs a client project from one team chat on Switch, from kickoff to delivery."},
+ {"id": "s1_team", "text": "One template creates the whole team: five agents and four rooms, bridged to the team's Discord."},
+ {"id": "s2_kickoff", "text": "At kickoff, the Planner turns the client brief into executable rules. Resetting the project and signing the contract both ask for an approval, right in the chat."},
+ {"id": "s3_dates", "text": "Dates are never guessed. The tools propose them from the work: build, then test and confirm, one item at a time, on working days only. The developer corrects an estimate, the holiday is skipped, and the project manager accepts the date."},
+ {"id": "s4_split", "text": "Later, the client sends one message with two requests. Reception has no access to the code. It splits them into two sheets and drafts the questions for the client."},
+ {"id": "s5_verify", "text": "On GO, each sheet goes to two verifiers in separate rooms. Claude Code verifies and Codex cross-checks blind. Both run the signed contract against the app: a price of zero is a security defect."},
+ {"id": "s6_plan", "text": "The Planner compares both verdicts. The free order becomes a hotfix, and the PDF export becomes a quote for the next version. The hotfix pushes the release, so the Planner proposes a delay, and only the project manager can accept it."},
+ {"id": "s7_client", "text": "An unexpected event costs two more working days. The client update says what is free, what is billed, and every date with the reason it moved."},
+ {"id": "s8_delivery", "text": "Delivery goes through staging. An approval from the developer does not count: only the tech lead can promote. And production still waits while a security rule fails."},
+ {"id": "s9_outro", "text": "Humans decide, the tools check, and the chat keeps the record. Scope Firewall, built on Switch."}
 ]
