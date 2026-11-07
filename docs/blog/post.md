@@ -1,106 +1,71 @@
 ---
-title: Bugs stay free, features get quoted: running a client project from the team chat
+title: What I learned building a client project team of AI agents on Switch
 published: false
-tags: ai, agents, productivity, devops
+tags: ai, agents, discord, productivity
 cover_image: https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/diagram.png
 ---
 
-Every agency has received this message:
+I gave myself one rule for this hackathon: build something a real agency could use on Monday morning. Not a chatbot, a team.
 
-> "A customer entered a price of 0 and got a free order. And while you are at it, please add a PDF export of our orders."
+The pain I picked is one every freelancer knows. A client writes "a customer got a free order, and while you are at it, add a PDF export". One message, two requests: a bug we owe them for free, and new work they should pay for. Mixed together, the feature slips in for free and the deadline becomes a guess.
 
-Two requests in one breath. The first one is our bug: the app breaks a rule we agreed on, so we fix it for free, and fast. The second one is new work: it was never in the contract, so it deserves a quote and a place in the next version.
+So I spent the hackathon building a small team of AI agents that lives in our Discord and runs a client project from kickoff to delivery. Here is how it went, what Switch made easy, and where I got stuck.
 
-When the two arrive together, teams lose twice. The feature slips in for free while the real bug waits. Then the delivery date turns out to be a guess, nobody counted the testing time, and when something unexpected happens the client hears about it last.
+![The workflow I ended up with](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/diagram.png)
 
-So for the Flip the Switch Hackathon I built **Scope Firewall**: a small team of AI agents on Switch that runs a client project from kickoff to delivery, right inside the team's Discord. The agents do the legwork. People make the decisions.
+## Starting from one file
 
-![How Scope Firewall works](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/diagram.png)
+The first thing that clicked was the template. In Switch, one YAML file describes the agents, their instructions and the rooms they live in. I imported it and five agents and four Discord channels appeared at once.
 
-## The team
+That changed how I worked. Every time I wanted to change the team, I edited one file and imported it again. By the end, the whole architecture of the project was readable in that single template, which is also what the next agency would import for their own client.
 
-One Switch template creates five agents and four rooms.
+## Rooms turned out to be the architecture
 
-**Reception** reads client messages. It has no access to the code, on purpose: a client's words can never steer an agent that holds the repository.
-**The Verifier** runs on Claude Code and checks each request against the signed contract.
-**The Contradictor** runs on Codex and does the same check, blind, in another room.
-**The Planner** turns confirmed verdicts into a plan, quotes and dates.
-**The Fixer** builds the fixes through pull requests.
+I wanted a second opinion on every bug that could not be biased by the first one. My first instinct was to write rules telling the second agent "do not read the first agent's answer". Then I realized Switch already solved it: if the second agent is simply not in the first agent's room, it cannot read it.
 
-## One project, start to finish
+So the Verifier runs on Claude Code in one room, and the Contradictor runs on Codex in another. Same request, two providers, no way to copy. The day they both found the same security hole on their own, I knew the design was right.
 
-### 1. The contract comes first
+![The Verifier's verdict, backed by a real run of the contract](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot3_mock.png)
 
-A teammate pastes the client brief. The Planner turns it into rules the app must pass, like "a price of 0 or less is refused". It asks about anything the brief leaves open, then a named person signs. From that moment the contract is frozen, and it settles every future argument about what is a bug and what is new work.
+## Teaching agents to pass the work along
 
-### 2. Dates come from real work
+Agents talking to each other was the part I feared most. In practice it was two words typed in the chat. "GO" tells Reception to hand a request to both rooms. "COMPARE" tells the Planner to read both rooms and decide.
 
-This is the part I care about most. The Planner never invents a date. A small tool proposes one: each item is built, then tested and confirmed working before the next one starts, counting working days only.
+What I like is that the humans stay in charge of the rhythm. Nothing moves until a teammate says so, and everything that moves is visible in the channel.
 
-Then the developer steps in: "F5 is bigger than you think, it touches the validation and its tests." The date moves from November 10 to November 13, skipping the November 11 holiday. The project manager accepts, and only then does it become a promise to the client.
+## Approvals where the team already is
 
-![The developer corrects an estimate, the project manager accepts the date](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot1_mock.png)
+Some steps must never happen on their own: resetting a project, going to production. Switch shows an Allow or Decline prompt right in the chat for those. I only had to mark which commands are risky, and every one of them now stops and waits for a person.
 
-### 3. One message becomes two requests
+## The lesson I did not expect: prompts are not safeguards
 
-Reception splits the client's message into two sheets, one for the free order and one for the PDF export, and drafts the questions to send back.
+My first version let the Planner set delivery dates. It worked, and it was wrong. An AI should not promise a date to a client.
 
-![Reception splits the message](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot2_mock.png)
+So I moved every decision into small tested scripts. A script computes the date from the real work: build, then test and confirm, one item at a time, on working days only. A developer corrects an estimate, and only the project manager can accept the date. A team file says who may do what, and the scripts refuse anyone else, whatever the prompt says.
 
-### 4. Two opinions that cannot copy each other
+![A developer corrects the estimate, the project manager accepts the date](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot1_mock.png)
 
-On "GO", each sheet goes to the Verifier and the Contradictor, in separate rooms. Neither can read the other's reasoning. Both run the contract against the real app and reach the same answer on their own: a price of 0 gives a total of 0, and a price of minus 10 gives a negative total. That is a security bug.
-
-![The Verifier's verdict, backed by the contract run](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot3_mock.png)
-
-### 5. The plan, the quote and an honest delay
-
-On "COMPARE", the Planner reads both rooms. They agree, so the free order becomes a hotfix and the PDF export becomes a quote for version 1.1. The hotfix pulls the developer away from the main release, so the Planner proposes a one day delay and waits. Only the project manager can accept it.
-
-![Hotfix, quote and a proposed delay](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot4_mock.png)
-
-### 6. When the unexpected happens
-
-The payment provider's sandbox goes down until Wednesday. The project manager types one line, the date moves two working days, and the client update says it plainly: what is free, what is billed, and every date with the reason it moved.
-
-![The client update carries every date and its reason](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot5_mock.png)
-
-### 7. Delivery with the right people
-
-Staging gets deployed. Someone says the developer approved going to production. The Planner refuses: only the tech lead can do that. When the tech lead insists, Switch shows an Allow or Decline prompt in the chat. We decline, because a security rule still fails, and production stays untouched.
+When someone said "the developer approved the release", the Planner answered that only the tech lead can promote. That was not the model being clever. It was the tool saying no.
 
 ![A developer's approval does not count](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot6_mock.png)
 
-## Humans decide, tools check
+## Where I got stuck
 
-One rule guided the whole build: **an AI never makes a decision that belongs to a person, and a prompt is never the only safeguard.**
+**Thread names.** Discord threads were named after the raw first message, so a mention showed up as a long number. The fix is one line in the Discord bridge: use Discord's clean text instead. I patched it locally and I hope it lands upstream.
 
-Every decision goes through a small tested script, not a model's opinion. One script runs the contract against the app. One compares the two verdicts. One computes dates. A simple team file says who may do what, so if an agent tries to accept a date in the developer's name, the tool says no, whatever the prompt said.
+**One account, many roles.** To film a developer and a project manager disagreeing, I needed two people. I used a Discord webhook to play the developer, and Switch bridged its messages like any teammate's.
 
-## Why Switch made this easy
+**Small rough edges.** The Mac went to sleep and the bridge stopped listening until I restarted the server. A template import reported a timeout although everything had been created. OpenCode was refused as a provider, so I stayed with Claude Code and Codex.
 
-Most of this design is Switch, not code I had to write.
-
-**Rooms** made the second opinion truly blind: the Contradictor is simply not in the Verifier's room.
-**Two providers in one team** means Claude Code and Codex do not share the same blind spots.
-**Addressing rules** let anyone talk to Reception while the other agents answer only their owner.
-**Handoffs between agents** carry each sheet into both rooms and bring both verdicts back.
-**Approvals in the chat** stop every risky command until a person clicks Allow.
-**Templates** recreate the whole team for the next client in one import.
+None of these stopped me for long, and each one taught me how Switch is put together.
 
 ## What I would love Switch to do next
 
-Discord threads are named from the raw first message, so a mention shows up as a long number. Discord already offers a clean version of the text, and using it is a one line change. I patched it locally for the demo.
-
-Agents cannot see the sender's Discord roles yet, so I enforce roles in my own tools. Passing them along would let teams reuse the permissions they already have.
-
-Updating a running team from a new version of its template still means deleting it and importing it again.
+Pass the sender's Discord roles to the agents, so teams can reuse the permissions they already have. Let a running team update from a new version of its template without being deleted and imported again. And ship the thread name fix.
 
 ## Try it
 
-The demo video (2 minutes): **[VIDEO LINK]**
-The code, with setup in the README: https://github.com/ru-ji/scope-firewall
+Demo video (2 minutes): **[VIDEO LINK]**
+Code and setup: https://github.com/ru-ji/scope-firewall
 
-You can run the core in two minutes with nothing but Python, then import the template into Switch and point it at your own Discord or Mattermost.
-
-Bugs stay free, features get quoted, every date comes from real work, and the chat keeps the record.
+If you run a client project, import the template, point it at your Discord, and paste the next confusing client message you get. Bugs stay free, features get quoted, and every date comes from real work.

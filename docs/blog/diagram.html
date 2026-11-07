@@ -23,10 +23,9 @@ const S=n=>`https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/${n}.svg`;
 const N=[
 ["brief",80,110,"logo:discord","#5865F2","Client brief","#planning"],
 ["draft",270,110,"doc_checkmark_fill","#7c5cff","Planner","drafts the rules"],
-["sign",460,110,"signature","#f08a24","Signature","in the chat"],
-["dates",650,110,"calendar_badge_plus","#22a06b","Dates","working days + tests"],
-["dev",840,110,"hammer_fill","#f08a24","Developer","corrects the estimate"],
-["pm",1030,110,"checkmark_seal_fill","#f08a24","Project manager","accepts the date"],
+["dates",460,110,"calendar_badge_plus","#22a06b","Dates","working days + tests"],
+["dev",650,110,"hammer_fill","#f08a24","Developer","corrects the estimate"],
+["pm",840,110,"checkmark_seal_fill","#f08a24","Project manager","accepts the date"],
 ["msg",80,400,"logo:discord","#5865F2","Client message","#client-requests"],
 ["rec",270,400,"arrow_branch","#7c5cff","Reception","one sheet per request"],
 ["ver",460,310,"logo:claude","#d97757","Verifier","Claude Code"],
@@ -39,7 +38,7 @@ const N=[
 ["hold",1410,400,"hand_raised_fill","#e5484d","Refused","anyone else"],
 ["quote",840,490,"tag_fill","#22a06b","Quote","next version"],
 ["upd",1030,490,"paperplane_fill","#f08a24","Client update","dates + reasons"]];
-const E=[["brief","draft"],["draft","sign"],["sign","dates"],["dates","dev"],["dev","pm"],
+const E=[["brief","draft"],["draft","dates"],["dates","dev"],["dev","pm"],
 ["msg","rec"],["rec","ver"],["rec","con"],["ver","cmp"],["con","cmp"],["cmp","fix","defect"],["cmp","quote","feature"],
 ["fix","stage"],["stage","lead"],["lead","prod"],["lead","hold"],["quote","upd"]];
 const P={},n=document.getElementById("n"),svg=document.querySelector("svg.edges");
