@@ -1,67 +1,91 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><style>
 *{box-sizing:border-box;margin:0}
-body{width:1600px;height:1000px;font-family:-apple-system,"SF Pro Display",system-ui,sans-serif;color:#eef0ff;
- background:radial-gradient(900px 600px at 15% 10%,#3b2a8a 0%,transparent 60%),
-            radial-gradient(800px 600px at 90% 90%,#7a2a6e 0%,transparent 60%),#0d0f1f;overflow:hidden;position:relative}
-.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
- linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:40px 40px}
-header{position:absolute;top:58px;width:100%;text-align:center}
-.eyebrow{font-size:15px;letter-spacing:.32em;color:#a7a3ff;font-weight:600}
-h1{font-size:50px;font-weight:700;letter-spacing:-.02em;margin-top:12px;
- background:linear-gradient(90deg,#fff,#c9c4ff 60%,#ffb3d9);-webkit-background-clip:text;color:transparent}
-.sub{font-size:20px;color:#9a9cc0;margin-top:10px}
-.lane{position:absolute;left:80px;right:80px}
-.label{font-size:13px;letter-spacing:.28em;color:#8486ad;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:14px}
-.label:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.15),transparent)}
-.row{display:flex;align-items:center;justify-content:center;gap:0}
-.card{width:300px;height:104px;border-radius:20px;padding:20px 22px;position:relative;
- background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.035));
- border:1px solid rgba(255,255,255,.13);box-shadow:0 18px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);
- backdrop-filter:blur(8px)}
-.card .t{font-size:22px;font-weight:650;display:flex;align-items:center;gap:10px}
-.card .s{font-size:15.5px;color:#a9abcb;margin-top:7px}
-.dot{width:10px;height:10px;border-radius:50%}
-.person .dot{background:#ffb454;box-shadow:0 0 14px #ffb454}
-.agent .dot{background:#7c8cff;box-shadow:0 0 14px #7c8cff}
-.tool .dot{background:#3ee39a;box-shadow:0 0 14px #3ee39a}
-.person{border-color:rgba(255,180,84,.35)}
-.agent{border-color:rgba(124,140,255,.35)}
-.tool{border-color:rgba(62,227,154,.35)}
-.arrow{width:46px;height:2px;margin:0 6px;position:relative;background:linear-gradient(90deg,rgba(255,255,255,.1),rgba(255,255,255,.55))}
-.arrow:after{content:"";position:absolute;right:-2px;top:-5px;border:6px solid transparent;border-left:9px solid rgba(255,255,255,.65)}
-.stack{display:flex;flex-direction:column;gap:16px}
-.stack .card{height:88px;padding:14px 22px}
-.split{width:46px;height:120px;margin:0 6px}
-.legend{position:absolute;bottom:52px;width:100%;display:flex;justify-content:center;gap:46px;font-size:17px;color:#b9bbdb}
-.legend span{display:flex;align-items:center;gap:10px}
-</style></head><body><div class="grid"></div>
-<header><div class="eyebrow">SCOPE FIREWALL · BUILT ON SWITCH</div>
-<h1>One client project, one team chat</h1>
-<div class="sub">Agents do the legwork. People decide. Tested tools check.</div></header>
+body{width:1800px;height:820px;font-family:-apple-system,"SF Pro Text",system-ui,sans-serif;position:relative;overflow:hidden;
+ background:#f4f4f6;background-image:radial-gradient(#cfd0d8 1.3px,transparent 1.3px);background-size:22px 22px}
+.top{position:absolute;left:40px;top:28px;display:flex;align-items:center;gap:14px}
+.logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#ff6d5a,#ea4b71);display:grid;place-items:center}
+.top h1{font-size:24px;font-weight:700;color:#2b2d3a}
+.top .tag{font-size:13px;color:#7b7e92;background:#fff;border:1px solid #e1e2ea;border-radius:20px;padding:5px 12px}
+.active{position:absolute;right:40px;top:32px;font-size:14px;color:#2b2d3a;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e1e2ea;border-radius:20px;padding:6px 14px}
+.active i{width:30px;height:16px;border-radius:9px;background:#3ecf8e;position:relative}.active i:after{content:"";position:absolute;right:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff}
+.sticky{position:absolute;border-radius:8px;padding:14px 18px;font-size:14px;font-weight:600;color:#5a4a1a}
+.sticky span{display:block;font-weight:400;font-size:13px;opacity:.75;margin-top:3px}
+svg.edges{position:absolute;inset:0}
+.node{position:absolute;width:92px;height:92px;margin:-46px 0 0 -46px;background:#fff;border:2px solid #d5d6df;border-radius:14px;
+ display:grid;place-items:center;box-shadow:0 4px 14px rgba(40,40,70,.10)}
+.node.trigger{border-radius:46px 14px 14px 46px}
+.node svg{width:40px;height:40px}
+.node .badge{position:absolute;top:-10px;right:-10px;font-size:11px;font-weight:700;color:#fff;border-radius:10px;padding:3px 7px}
+.node .port{position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #9a9db0;top:38px}
+.node .in{left:-8px}.node .out{right:-8px}
+.cap{position:absolute;width:170px;margin-left:-85px;text-align:center}
+.cap b{display:block;font-size:15px;color:#2b2d3a;font-weight:650}
+.cap small{display:block;font-size:12.5px;color:#7b7e92;margin-top:3px;line-height:1.3}
+.pill{position:absolute;transform:translate(-50%,-50%);font-size:11.5px;font-weight:600;color:#55586d;background:#fff;border:1px solid #d5d6df;border-radius:12px;padding:3px 9px}
+.legend{position:absolute;left:40px;bottom:26px;display:flex;gap:22px;font-size:13px;color:#55586d}
+.legend span{display:flex;align-items:center;gap:7px}.legend i{width:12px;height:12px;border-radius:4px}
+</style></head><body>
+<div class="top"><div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 12h6l2-5 3 10 2-5h3"/></svg></div>
+<h1>Scope Firewall</h1><div class="tag">Switch template · 5 agents · 4 rooms · Discord</div></div>
+<div class="active"><i></i>Active</div>
 
-<div class="lane" style="top:250px"><div class="label">KICKOFF</div><div class="row">
-<div class="card person"><div class="t"><i class="dot"></i>Client brief</div><div class="s">pasted in #planning</div></div><div class="arrow"></div>
-<div class="card tool"><div class="t"><i class="dot"></i>Signed contract</div><div class="s">rules the app must pass</div></div><div class="arrow"></div>
-<div class="card tool"><div class="t"><i class="dot"></i>Dates proposed</div><div class="s">working days, tests included</div></div><div class="arrow"></div>
-<div class="card person"><div class="t"><i class="dot"></i>Project manager</div><div class="s">accepts the date</div></div></div></div>
+<div class="sticky" style="left:40px;top:96px;width:1290px;height:230px;background:#fff6d6;border:1px solid #f3e3a3">1 · Kickoff<span>Brief to signed contract, then a date the project manager accepts</span></div>
+<div class="sticky" style="left:40px;top:356px;width:1720px;height:400px;background:#e9f0ff;border:1px solid #c9d8fb;color:#2a3d7a">2 · Every client message<span>Split, verified blind by two providers, planned, delivered with approvals</span></div>
 
-<div class="lane" style="top:455px"><div class="label">EVERY CLIENT MESSAGE</div><div class="row">
-<div class="card agent"><div class="t"><i class="dot"></i>Reception</div><div class="s">splits it, no code access</div></div>
-<svg class="split" viewBox="0 0 46 120"><path d="M0 60 C25 60 20 22 44 22 M0 60 C25 60 20 98 44 98" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none"/><path d="M38 17 L46 22 L38 27 M38 93 L46 98 L38 103" stroke="rgba(255,255,255,.7)" stroke-width="2" fill="none"/></svg>
-<div class="stack"><div class="card agent"><div class="t"><i class="dot"></i>Verifier</div><div class="s">Claude Code · #verification</div></div>
-<div class="card agent"><div class="t"><i class="dot"></i>Contradictor</div><div class="s">Codex · blind · #cross-check</div></div></div>
-<svg class="split" viewBox="0 0 46 120"><path d="M0 22 C22 22 20 60 44 60 M0 98 C22 98 20 60 44 60" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none"/><path d="M38 55 L46 60 L38 65" stroke="rgba(255,255,255,.7)" stroke-width="2" fill="none"/></svg>
-<div class="card agent"><div class="t"><i class="dot"></i>Planner</div><div class="s">compares both verdicts</div></div>
-<svg class="split" viewBox="0 0 46 120"><path d="M0 60 C25 60 20 22 44 22 M0 60 C25 60 20 98 44 98" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none"/><path d="M38 17 L46 22 L38 27 M38 93 L46 98 L38 103" stroke="rgba(255,255,255,.7)" stroke-width="2" fill="none"/></svg>
-<div class="stack"><div class="card tool"><div class="t"><i class="dot"></i>Defect → hotfix</div><div class="s">free, delay proposed</div></div>
-<div class="card tool"><div class="t"><i class="dot"></i>Feature → quote</div><div class="s">billed, next version</div></div></div></div></div>
+<svg class="edges" width="1800" height="900"></svg>
+<div id="nodes"></div>
+<div class="legend"><span><i style="background:#ff8a3d"></i>a person decides</span><span><i style="background:#6b7bff"></i>an AI agent works</span><span><i style="background:#21b07a"></i>a tested tool checks</span></div>
 
-<div class="lane" style="top:735px"><div class="label">DELIVERY</div><div class="row">
-<div class="card tool"><div class="t"><i class="dot"></i>Staging</div><div class="s">checked against the contract</div></div><div class="arrow"></div>
-<div class="card person"><div class="t"><i class="dot"></i>Tech lead</div><div class="s">the only one who promotes</div></div><div class="arrow"></div>
-<div class="card tool"><div class="t"><i class="dot"></i>Production</div><div class="s">Allow or Decline in the chat</div></div><div class="arrow"></div>
-<div class="card person"><div class="t"><i class="dot"></i>Client update</div><div class="s">every date and its reason</div></div></div></div>
-
-<div class="legend"><span class="person"><i class="dot"></i>a person decides</span><span class="agent"><i class="dot"></i>an AI agent works</span><span class="tool"><i class="dot"></i>a tested tool checks</span></div>
-</body></html>
+<script>
+const C={person:"#ff8a3d",agent:"#6b7bff",tool:"#21b07a"};
+const I={ // lucide style icons
+chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15l2 2 4-4"/>',
+pen:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 15h3"/>',
+code:'<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
+check:'<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>',
+split:'<path d="M16 3h5v5M8 3H3v5M12 22v-8.3a4 4 0 0 0-1.2-2.9L3 3M21 3l-7.8 7.8"/>',
+shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+eye:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>',
+merge:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M6 9v6M9 6h3a3 3 0 0 1 3 3v0M9 18h3a3 3 0 0 0 3-3"/>',
+zap:'<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+receipt:'<path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+server:'<rect x="2" y="3" width="20" height="8" rx="2"/><rect x="2" y="13" width="20" height="8" rx="2"/><path d="M6 7h.01M6 17h.01"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+rocket:'<path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1z"/><path d="M12 15 9 12a22 22 0 0 1 2-4A13 13 0 0 1 22 2c0 2.7-.8 7.5-6 11a22 22 0 0 1-4 2z"/>',
+mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>'};
+const N=[ // id, x, y, kind, icon, title, sub, trigger, badge
+["brief",130,215,"person","chat","Client brief","pasted in #planning",1],
+["draft",330,215,"agent","file","Planner","drafts executable rules"],
+["sign",530,215,"person","pen","Sign","a named person approves"],
+["dates",730,215,"tool","cal","Propose dates","working days, tests included"],
+["dev",930,215,"person","code","Developer","corrects an estimate"],
+["pm",1130,215,"person","check","Project manager","accepts the date"],
+["msg",130,540,"person","chat","Client message","pasted in #client-requests",1],
+["rec",330,540,"agent","split","Reception","one sheet per request"],
+["ver",540,455,"agent","shield","Verifier","Claude Code, runs contract"],
+["con",540,640,"agent","eye","Contradictor","Codex, blind, other room"],
+["cmp",760,540,"tool","merge","Compare","both verdicts must agree"],
+["fix",980,455,"tool","zap","Hotfix","defect: free, delay proposed"],
+["quote",980,640,"tool","receipt","Quote","feature: billed, next version"],
+["stage",1190,455,"tool","server","Staging","contract checked"],
+["lead",1390,455,"person","user","Tech lead","the only one who promotes"],
+["prod",1590,455,"tool","rocket","Production","Allow or Decline in chat"],
+["upd",1190,640,"person","mail","Client update","every date and its reason"]];
+const E=[["brief","draft"],["draft","sign"],["sign","dates"],["dates","dev"],["dev","pm"],
+["msg","rec"],["rec","ver","GO"],["rec","con","GO"],["ver","cmp"],["con","cmp"],["cmp","fix","COMPARE"],["cmp","quote"],
+["fix","stage"],["stage","lead"],["lead","prod","approve"],["quote","upd"]];
+const pos={};const box=document.getElementById("nodes");
+for(const [id,x,y,k,ic,t,s,tr] of N){pos[id]=[x,y];
+ box.insertAdjacentHTML("beforeend",`<div class="node ${tr?"trigger":""}" style="left:${x}px;top:${y}px;border-color:${C[k]}55">
+ <svg viewBox="0 0 24 24" fill="none" stroke="${C[k]}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${I[ic]}</svg>
+ ${tr?"":'<i class="port in"></i>'}<i class="port out"></i></div>
+ <div class="cap" style="left:${x}px;top:${y+56}px"><b>${t}</b><small>${s}</small></div>`);}
+const svg=document.querySelector("svg.edges");
+for(const [a,b,label] of E){const [x1,y1]=pos[a],[x2,y2]=pos[b];const sx=x1+52,ex=x2-52,mx=(sx+ex)/2;
+ svg.insertAdjacentHTML("beforeend",`<path d="M${sx} ${y1} C${mx} ${y1} ${mx} ${y2} ${ex} ${y2}" stroke="#a3a6b8" stroke-width="2.2" fill="none"/>
+ <path d="M${ex-8} ${y2-5} L${ex} ${y2} L${ex-8} ${y2+5}" stroke="#a3a6b8" stroke-width="2.2" fill="none"/>`);
+ if(label)box.insertAdjacentHTML("beforeend",`<div class="pill" style="left:${mx}px;top:${(y1+y2)/2}px">${label}</div>`);}
+</script></body></html>
