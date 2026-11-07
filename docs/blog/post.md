@@ -51,7 +51,6 @@ On the Switch side, I would love agents to see the sender's chat roles, so teams
 
 ## Try it yourself
 
-Demo video (2 minutes): **[VIDEO LINK]**
 Scope Firewall, with setup instructions: https://github.com/ru-ji/scope-firewall
 
 If your team already lives in a chat, try giving your agents a seat there. That is the whole idea behind Switch, and after this hackathon, I am convinced it is the right one.
