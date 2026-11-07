@@ -51,6 +51,7 @@ Severity: critical = payments fail for most clients; high = a wrong amount is ch
 - Reception masks passwords, tokens, emails and IPs before anything is posted.
 - Reception hands a sheet over only on a teammate's `GO`, and it has no repo access. The two agents that receive it are read-only.
 - The Planner reads the two verification rooms only to fetch VERDICT lines, and passes nothing between them until both exist.
+- Mattermost adds agents to its default channels (Town Square, Off-Topic). Nothing about a request is posted there.
 - No agent merges, deploys on its own or messages the client.
 
 ## Sources
