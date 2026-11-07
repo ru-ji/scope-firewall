@@ -5,3 +5,5 @@ demo/frames/c*.jpg
 .envs/
 .worktrees/
 .env
+demo/voice/
+demo/raw/

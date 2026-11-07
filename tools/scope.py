@@ -140,6 +140,7 @@ def new(replace_signed=False, today=None):
     for name in ("QUEUE.md", "ENVIRONMENTS.md", "DECISIONS.md"):
         _clear(os.path.join(base, name))
     _clear(VERSIONS_MD, "| v1.0 | MVP | signed contract | every rule of SCOPE.md | n/a | see SCOPE.md | accepted |\n")
+    open(os.path.join(base, "schedule.json"), "w").write("{}\n")
 
 
 def sign(draft_path, version, by, today=None):
