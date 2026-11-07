@@ -39,37 +39,37 @@ This is the part I care about most. The Planner never invents a date. A small to
 
 Then the developer steps in: "F5 is bigger than you think, it touches the validation and its tests." The date moves from November 10 to November 13, skipping the November 11 holiday. The project manager accepts, and only then does it become a promise to the client.
 
-![The developer corrects an estimate, the project manager accepts the date](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot1.png)
+![The developer corrects an estimate, the project manager accepts the date](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot1_mock.png)
 
 ### 3. One message becomes two requests
 
 Reception splits the client's message into two sheets, one for the free order and one for the PDF export, and drafts the questions to send back.
 
-![Reception splits the message](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot2.png)
+![Reception splits the message](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot2_mock.png)
 
 ### 4. Two opinions that cannot copy each other
 
 On "GO", each sheet goes to the Verifier and the Contradictor, in separate rooms. Neither can read the other's reasoning. Both run the contract against the real app and reach the same answer on their own: a price of 0 gives a total of 0, and a price of minus 10 gives a negative total. That is a security bug.
 
-![The Verifier's verdict, backed by the contract run](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot3.png)
+![The Verifier's verdict, backed by the contract run](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot3_mock.png)
 
 ### 5. The plan, the quote and an honest delay
 
 On "COMPARE", the Planner reads both rooms. They agree, so the free order becomes a hotfix and the PDF export becomes a quote for version 1.1. The hotfix pulls the developer away from the main release, so the Planner proposes a one day delay and waits. Only the project manager can accept it.
 
-![Hotfix, quote and a proposed delay](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot4.png)
+![Hotfix, quote and a proposed delay](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot4_mock.png)
 
 ### 6. When the unexpected happens
 
 The payment provider's sandbox goes down until Wednesday. The project manager types one line, the date moves two working days, and the client update says it plainly: what is free, what is billed, and every date with the reason it moved.
 
-![The client update carries every date and its reason](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot5.png)
+![The client update carries every date and its reason](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot5_mock.png)
 
 ### 7. Delivery with the right people
 
 Staging gets deployed. Someone says the developer approved going to production. The Planner refuses: only the tech lead can do that. When the tech lead insists, Switch shows an Allow or Decline prompt in the chat. We decline, because a security rule still fails, and production stays untouched.
 
-![A developer's approval does not count](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot6.png)
+![A developer's approval does not count](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot6_mock.png)
 
 ## Humans decide, tools check
 
