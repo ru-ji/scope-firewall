@@ -5,15 +5,17 @@ Usage:
   envs.py promote <approved by>          ship to production the commit that is on staging; refused if staging fails
                                          any contract rule that production passes (no regression), or without a
                                          named human approval
-  envs.py status                         which commit runs where, and its last contract result
+  envs.py rollback <approved by>         put production back on the release before the current one: no staging and
+                                         no regression check (that is the point), but a named human approval
+  envs.py status                         which commit runs where, UP or DOWN right now, and its last contract result
 
 Production is never deployed from a git ref, only promoted from staging. A hotfix can ship while a minor bug
 still waits for its patch (that rule already failed in production), but nothing that works today can break.
 """
-import datetime, json, os, signal, subprocess, sys, time, urllib.request
+import datetime, json, os, signal, socket, subprocess, sys, time, urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from contract import run as contract_run
+from contract import SCOPE, run as contract_run
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 LEDGER = os.path.join(ROOT, "ENVIRONMENTS.md")
@@ -52,7 +54,20 @@ def _failing(row):
     return set() if row["Failing"] == "-" else set(row["Failing"].split(", "))
 
 
-def can_promote(rows, approved_by):
+def failing_at(row):
+    """Rules this commit fails under the CURRENT contract. A ledger row only knows the contract of its day: a rule
+    added since by an amendment is missing from it and would look like it works in production."""
+    os.makedirs(WORK, exist_ok=True)
+    app = os.path.join(WORK, f"app-{row['Commit']}.py")
+    with open(app, "w") as f:
+        found = subprocess.run(["git", "-C", ROOT, "show", f"{row['Commit']}:{SCOPE['app']}"], stdout=f,
+                               stderr=subprocess.DEVNULL).returncode == 0
+    if not found:
+        os.remove(app)
+    return {c["rule"] for c in contract_run("--local=" + app) if not c["pass"]}
+
+
+def can_promote(rows, approved_by, failing=_failing):
     """Pure rule, tested: returns (ok, reason, commit). No regression: staging may only fail rules production
     already fails. The first promotion sets the production baseline."""
     if not approved_by.strip():
@@ -61,16 +76,50 @@ def can_promote(rows, approved_by):
     if st is None:
         return False, "nothing is deployed on staging", None
     if prod is not None:
-        regressions = sorted(_failing(st) - _failing(prod))
+        regressions = sorted(failing(st) - failing(prod))
         if regressions:
             return False, f"regression on staging {st['Commit']}: {', '.join(regressions)} works in production", st["Commit"]
-        fixed = sorted(_failing(prod) - _failing(st))
+        fixed = sorted(failing(prod) - failing(st))
         return True, f"staging {st['Commit']} fixes {', '.join(fixed) or 'nothing new'}, no regression", st["Commit"]
     return True, f"first production baseline: {st['Commit']} ({st['Contract']})", st["Commit"]
 
 
+def rollback_target(rows, approved_by):
+    """Pure rule, tested: returns (ok, reason, commit). Each rollback steps back one release, it never flips back."""
+    if not approved_by.strip():
+        return False, "a named human approval is required", None
+    releases = []
+    for r in rows:
+        if r["Env"] != "production":
+            continue
+        if r["By"].startswith("rollback"):
+            releases.pop()
+        elif not releases or releases[-1] != r["Commit"]:
+            releases.append(r["Commit"])
+    if len(releases) < 2:
+        return False, "no earlier release to go back to", None
+    return True, f"production {releases[-1]} back to {releases[-2]}", releases[-2]
+
+
 def _git(*args):
     return subprocess.run(["git", "-C", ROOT, *args], check=True, capture_output=True, text=True).stdout.strip()
+
+
+def _port_open(port):
+    try:
+        socket.create_connection(("127.0.0.1", port), 0.2).close()
+        return True
+    except OSError:
+        return False
+
+
+def up(env):
+    """True only if the process we started is alive and its port answers: the ledger alone proves nothing."""
+    try:
+        os.kill(int(open(os.path.join(WORK, f"{env}.pid")).read()), 0)
+    except (OSError, ValueError):
+        return False
+    return _port_open(PORTS[env])
 
 
 def _start(env, commit):
@@ -80,9 +129,14 @@ def _start(env, commit):
     if os.path.exists(pidfile):
         try:
             os.kill(int(open(pidfile).read()), signal.SIGTERM)
-            time.sleep(0.5)
         except (ProcessLookupError, ValueError):
             pass
+    for _ in range(20):
+        if not _port_open(PORTS[env]):
+            break
+        time.sleep(0.1)
+    else:  # never run the contract against someone else's server
+        raise SystemExit(f"REFUSED: port {PORTS[env]} is used by another process, stop it first")
     if os.path.exists(tree):
         _git("worktree", "remove", "--force", tree)
     _git("worktree", "add", "--force", "--detach", tree, commit)
@@ -98,6 +152,8 @@ def _start(env, commit):
             break  # the server answers (any HTTP status means it is up)
         except OSError:
             time.sleep(0.25)
+    if p.poll() is not None:
+        raise SystemExit(f"REFUSED: the app of {commit} did not start, see {log.name}")
     return url
 
 
@@ -115,11 +171,20 @@ def deploy_staging(ref, by="Planner"):
 
 
 def promote(approved_by):
-    ok, reason, commit = can_promote(load(), approved_by)
+    ok, reason, commit = can_promote(load(), approved_by, failing_at)
     if not ok:
         raise SystemExit(f"REFUSED: {reason}")
     passed, total, failed = _check(_start("production", commit))
     record("production", commit, passed, total, failed, f"approved by {approved_by}")
+    return commit, passed, total, failed
+
+
+def rollback(approved_by):
+    ok, reason, commit = rollback_target(load(), approved_by)
+    if not ok:
+        raise SystemExit(f"REFUSED: {reason}")
+    passed, total, failed = _check(_start("production", commit))
+    record("production", commit, passed, total, failed, f"rollback approved by {approved_by}")
     return commit, passed, total, failed
 
 
@@ -128,7 +193,7 @@ def status():
     out = []
     for env in PORTS:
         r = current(env, rows)
-        out.append(f"{env:<10} port {PORTS[env]}  " + (f"commit {r['Commit']}  contract {r['Contract']}  failing {r['Failing']}  ({r['By']}, {r['Time']})"
+        out.append(f"{env:<10} port {PORTS[env]}  {'UP' if up(env) else 'DOWN':<4}  " + (f"commit {r['Commit']}  contract {r['Contract']}  failing {r['Failing']}  ({r['By']}, {r['Time']})"
                                                        if r else "nothing deployed"))
     return "\n".join(out)
 
@@ -138,12 +203,15 @@ if __name__ == "__main__":
     if a[:2] == ["deploy", "staging"] and len(a) == 3:
         c, p, t, f = deploy_staging(a[2])
         print(f"staging <- {c}: contract {p}/{t}, failing: {', '.join(f) or 'none'}")
-        print(can_promote(load(), "check")[1])
+        print(can_promote(load(), "check", failing_at)[1])
     elif a[:1] == ["deploy"]:
         raise SystemExit("REFUSED: production is never deployed directly; use `envs.py promote <approved by>`")
     elif a[:1] == ["promote"] and len(a) == 2:
         c, p, t, f = promote(a[1])
         print(f"production <- {c}: contract {p}/{t}, failing: {', '.join(f) or 'none'}")
+    elif a[:1] == ["rollback"] and len(a) == 2:
+        c, p, t, f = rollback(a[1])
+        print(f"production rolled back to {c}: contract {p}/{t}, failing: {', '.join(f) or 'none'}")
     elif a[:1] == ["status"]:
         print(status())
     else:

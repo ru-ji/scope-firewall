@@ -53,4 +53,37 @@ try:
 except SystemExit:
     pass
 assert "frozen" in sc.status() and "F3 (v1.1)" in sc.status()
+
+# CI gate: a frozen contract only grows through an amendment for an accepted change request.
+import copy
+base, v = sc.load(), os.path.join(d, "VERSIONS.md")
+assert sc.verify_change(base, base, v) == []
+weak = copy.deepcopy(base); weak["rules"][0]["checks"] = []
+assert "F1" in sc.verify_change(base, weak, v)[0]                               # weakened by hand
+gone = copy.deepcopy(base); gone["rules"].pop()
+assert sc.verify_change(base, gone, v)                                          # removed by hand
+extra = copy.deepcopy(base); extra["rules"].append(rule("F9", "z"))
+assert "F9" in sc.verify_change(base, extra, v)[0]                              # added without an amendment
+unsigned = copy.deepcopy(base); unsigned["signed"] = {"by": "x", "date": "2026-01-01"}
+assert sc.verify_change(base, unsigned, v)
+ok = copy.deepcopy(extra); ok["amendments"].append({"cr": "CR-001", "version": "v1.1", "by": "a", "date": "d", "rules": ["F9"]})
+assert sc.verify_change(base, ok, v) == []
+fake = copy.deepcopy(ok); fake["amendments"][-1]["cr"] = "CR-404"
+assert sc.verify_change(base, fake, v)                                          # no accepted change request behind it
+
+# New project: blank contract and empty ledgers, the signed one is only replaced on request.
+open(os.path.join(d, "DECISIONS.md"), "w").write("# DECISIONS\n<!-- format -->\n2026-11-05 | B1 | x | y | z\n")
+open(os.path.join(d, "QUEUE.md"), "w").write("# QUEUE\n\n| Id |\n| --- |\n| B10 |\n")
+try:
+    sc.new(); raise AssertionError("a signed contract needs the flag")
+except SystemExit:
+    pass
+sc.new(True, today)
+s = sc.load()
+assert not s["frozen"] and s["rules"] == [] and "Not signed yet" in open(os.path.join(d, "SCOPE.md")).read()
+assert "| B10 |" not in open(os.path.join(d, "QUEUE.md")).read() and "| B1 |" not in open(os.path.join(d, "DECISIONS.md")).read()
+assert "CR-001" not in open(v).read() and "| MVP |" in open(v).read()
+assert sc.verify_change(base, s, v) == []                                       # replacing is a declared act, not a hand edit
+json.dump([rule("F1", "a")], open(draft, "w"))
+assert sc.sign(draft, "v1.0", "asher", today)["frozen"]                         # and the kickoff starts again
 print("ok")

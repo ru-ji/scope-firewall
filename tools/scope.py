@@ -1,11 +1,15 @@
 """Contract lifecycle. scope.json is the source of truth; SCOPE.md is regenerated from it, so they cannot drift.
 
 Usage:
+  scope.py new [--replace-signed]                        new project: blank contract and empty ledgers (git keeps the old
+                                                         ones); a signed contract is only replaced with the flag
   scope.py sign <draft.json> <version> "<signed by>"     kickoff: validate the drafted rules, write them to scope.json,
                                                          freeze the version and regenerate SCOPE.md
   scope.py amend <draft.json> <CR-id> "<signed by>"      evolution: add rules for a change request the client ACCEPTED
                                                          in VERSIONS.md; the contract moves to that request's version
   scope.py status                                        version, frozen or not, rules, amendments
+  scope.py verify-change <base scope.json>               CI gate: compare with the base commit; a frozen contract only
+                                                         grows through an amendment for an accepted change request
 
 A draft is a JSON list of rules: {"id": "F1", "feature": "...", "security": false, "text": "...", "checks": [
   {"name": "...", "body": {...}, "status": 200, "total": 20, "fields": {...}, "present": [...], "path": "/x"}]}
@@ -118,6 +122,26 @@ def _taken(scope):
     return [r["id"] for r in scope["rules"]], [c["name"] for r in scope["rules"] for c in r["checks"]]
 
 
+def _clear(path, tail=""):
+    """Empty a ledger, keeping its header (everything down to the table separator or the format comment)."""
+    if os.path.exists(path):
+        lines = open(path).read().splitlines(keepends=True)
+        last = max((i for i, l in enumerate(lines) if l.startswith(("| ---", "<!--"))), default=-1)
+        open(path, "w").write("".join(lines[:last + 1]) + tail)
+
+
+def new(replace_signed=False, today=None):
+    scope = load()
+    if scope.get("frozen") and not replace_signed:
+        raise SystemExit(f"REFUSED: {scope['version']} is signed; replacing it for a new project needs --replace-signed")
+    save({"version": "v0", "endpoint": scope["endpoint"], "app": scope["app"], "frozen": False, "rules": [],
+          "replaced": (today or datetime.date.today()).isoformat()})
+    base = os.path.dirname(SCOPE_JSON)
+    for name in ("QUEUE.md", "ENVIRONMENTS.md", "DECISIONS.md"):
+        _clear(os.path.join(base, name))
+    _clear(VERSIONS_MD, "| v1.0 | MVP | signed contract | every rule of SCOPE.md | n/a | see SCOPE.md | accepted |\n")
+
+
 def sign(draft_path, version, by, today=None):
     scope = load()
     if scope.get("frozen"):
@@ -170,6 +194,30 @@ def amend(draft_path, cr_id, by, versions_path=None, today=None):
     return scope
 
 
+def verify_change(base, head, versions_path=None):
+    """Problems with going from the base contract to the head one; empty means the change is legitimate."""
+    if not base.get("frozen"):
+        return []
+    # ponytail: `new` is trusted on its "replaced" date, so a PR that sets it is only caught by the human review
+    if head.get("replaced") and head["replaced"] != base.get("replaced"):
+        return []
+    errs = []
+    if not head.get("frozen") or head.get("signed") != base.get("signed"):
+        errs.append("the signature or the freeze changed")
+    rules, kept = {r["id"]: r for r in head["rules"]}, base.get("amendments", [])
+    errs += [f"{r['id']} was changed or removed in a frozen contract" for r in base["rules"] if rules.get(r["id"]) != r]
+    if head.get("amendments", [])[:len(kept)] != kept:
+        errs.append("a past amendment was changed")
+    added = head.get("amendments", [])[len(kept):]
+    covered = {i for a in added for i in a["rules"]}
+    errs += [f"{i} was added without an amendment" for i in rules if i not in {r["id"] for r in base["rules"]} | covered]
+    for a in added:
+        cr = accepted_cr(a["cr"], versions_path)
+        if cr is None or cr[1] not in ("accepted", "delivered"):
+            errs.append(f"{a['cr']} was not accepted by the client")
+    return errs
+
+
 def status():
     s = load()
     sig = s.get("signed")
@@ -182,7 +230,15 @@ def status():
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    if a[:1] == ["sign"] and len(a) == 4:
+    if a[:1] == ["new"] and a[1:] in ([], ["--replace-signed"]):
+        new(bool(a[1:]))
+        print("blank contract, empty ledgers. Next: KICKOFF with the client brief.")
+    elif a[:1] == ["verify-change"] and len(a) == 2:
+        errs = verify_change(json.load(open(a[1])), load())
+        if errs:
+            raise SystemExit("REFUSED:\n- " + "\n- ".join(errs))
+        print("contract change is legitimate")
+    elif a[:1] == ["sign"] and len(a) == 4:
         s = sign(a[1], a[2], a[3])
         print(f"signed {s['version']}: {len(s['rules'])} rules, frozen. SCOPE.md regenerated.")
     elif a[:1] == ["amend"] and len(a) == 4:

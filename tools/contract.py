@@ -38,6 +38,8 @@ _handlers = {}
 
 def _post_local(body, app=None, path=None):
     app = os.path.join(ROOT, app or SCOPE["app"])
+    if not os.path.exists(app):
+        return 0, "app not built yet"
     if app not in _handlers:
         spec = importlib.util.spec_from_file_location(f"scope_app_{len(_handlers)}", app)
         mod = importlib.util.module_from_spec(spec)
@@ -60,6 +62,8 @@ def _post_http(base, body, path=None):
             return r.status, r.read().decode()
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode()
+    except OSError as e:
+        return 0, f"unreachable: {e}"
 
 
 def post(target, body, path=None):

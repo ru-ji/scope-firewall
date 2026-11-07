@@ -2,6 +2,7 @@
 # tests:    the tooling itself (contract checker, lanes, ledgers, environments). Must always be green.
 # contract: no regression. Every contract rule that passes on the base commit must still pass, so a hotfix can ship
 #           while another minor bug waits for its patch. Open failures are listed, not blocking.
+#           A frozen contract only grows through an amendment: nobody weakens a rule to make a check pass.
 #           Make both jobs required in Settings > Branches > main > Require status checks, plus 1 required review.
 name: ci
 on: [push, pull_request]
@@ -20,10 +21,15 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
+      - name: The frozen contract was not edited by hand
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          git show "$BASE:scope.json" > /tmp/base_scope.json 2>/dev/null || git show HEAD~1:scope.json > /tmp/base_scope.json 2>/dev/null || echo '{}' > /tmp/base_scope.json
+          python3 tools/scope.py verify-change /tmp/base_scope.json
       - name: No regression against the base commit
         run: |
           BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
-          git show "$BASE:demo-app/app.py" > /tmp/base_app.py 2>/dev/null || git show HEAD~1:demo-app/app.py > /tmp/base_app.py
+          git show "$BASE:demo-app/app.py" > /tmp/base_app.py 2>/dev/null || git show HEAD~1:demo-app/app.py > /tmp/base_app.py 2>/dev/null || rm -f /tmp/base_app.py
           python3 tools/contract.py regress /tmp/base_app.py demo-app/app.py
       - name: Open contract failures (informational)
         run: |
