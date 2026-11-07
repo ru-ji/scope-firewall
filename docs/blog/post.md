@@ -21,7 +21,7 @@ I discovered Switch through the Flip the Switch Hackathon and entered the Best B
 
 I built **Scope Firewall**, a team of five agents that follows a client project in Discord, from the first brief to delivery.
 
-It turns the client's brief into a contract of rules the app must pass, proposes a delivery date from the real work, splits every client message into separate requests, checks each one with two independent AI opinions, and routes it: a defect goes straight to a fix, anything new is planned for the next version. The agents do the work: they turn the brief into rules, verify every request, open the fix and deploy to staging. Teammates work with them in the same channels and make the calls that belong to a person: the estimate, the date, the release.
+The agents do the work. They turn the client's brief into a contract of rules the app must pass, propose a delivery date from the real work, split every client message into separate requests, and check each one with two independent AI opinions. A defect goes straight to a fix: an agent writes it and opens a pull request, then deploys it to staging. Anything new is planned for the next version. Teammates work with them in the same channels and make the calls that belong to a person: the estimate, the date, the review, the release.
 
 ![The workflow, built on Switch](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/diagram.png)
 
@@ -35,7 +35,7 @@ The moment it clicked came during the demo. I pasted a client message: "a custom
 
 ![Claude Code's verdict in the verification room](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/shot3_mock.png)
 
-**Humans stayed in the loop without effort.** Agents pass work along when a teammate types a word like "GO" in the chat. Anything risky, like going to production, waits for an Allow or Decline click in the same conversation. My teammates never had to leave Discord.
+**Humans stayed in the loop without effort.** Agents pass work along when a teammate types a word like "GO" in the chat. When the Fixer wrote the fix, it opened a real pull request on GitHub with the contract run before and after, and a teammate reviewed it like any other. Anything risky, like going to production, waits for an Allow or Decline click in the same conversation. My teammates never had to leave Discord.
 
 **It also taught me a lesson.** My first version let an agent set delivery dates. It worked, and it was wrong. Switch's approval prompts meant a person always clicked the final button, and I moved the rules themselves into small tested tools, so that even a confused agent cannot accept a date or approve a release in someone else's name.
 

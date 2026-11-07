@@ -14,9 +14,9 @@ BG, INK, MUTED = (245, 245, 247), (29, 29, 31), (134, 134, 139)
 # the recording is already a real macOS window (title bar included): it is shown at this height, centred
 WY, CH = 128, 900
 # Discord is cropped to the conversation (no server icons, no channel list) and gets a minimal title bar
-CROP = {"discord": "crop=2098:1700:750:68,", "console": ""}
-ASPECT = {"discord": 2098 / 1700, "console": 2800 / 1800}
-BAR = {"discord": 40, "console": 0}
+CROP = {"discord": "crop=2098:1700:750:68,", "fixer": "crop=2098:1700:750:68,", "github": "crop=2848:1350:0:360,", "console": ""}
+ASPECT = {"discord": 2098 / 1700, "fixer": 2098 / 1700, "github": 2848 / 1350, "console": 2800 / 1800}
+BAR = {"discord": 40, "fixer": 40, "github": 40, "console": 0}
 
 SCENES = {  # id: (source, [(start, end), ...], caption)
     "s0_intro": (None, [], ("Scope Firewall", "A client project team of AI agents, built on Switch")),
@@ -25,7 +25,9 @@ SCENES = {  # id: (source, [(start, end), ...], caption)
     "s3_dates": ("discord", [(905, 935), (1000, 1030)], "Dates from real work, accepted by a person"),
     "s4_split": ("discord", [(1080, 1125)], "One client message, two requests"),
     "s5_verify": ("discord", [(1370, 1405), (1405, 1420)], "Two providers verify, blind"),
-    "s6_plan": ("discord", [(1505, 1532), (1650, 1675), (1745, 1762)], "A free hotfix, a paid quote, an honest delay"),
+    "s6_plan": ("discord", [(1505, 1532), (1650, 1675), (1745, 1762)], "A hotfix now, the feature next, an honest delay"),
+    "s6b_fix": ("fixer", [(14, 40), (180, 215)], "The agent writes the fix and opens a pull request"),
+    "s6c_pr": ("github", [(4, 50)], "One file, green checks, waiting for a teammate's review"),
     "s7_client": ("discord", [(1860, 1898)], "Every date comes with its reason"),
     "s8_delivery": ("discord", [(1975, 1998), (2050, 2101)], "Only the tech lead can ship"),
     "s9_outro": (None, [], ("Thank you for watching", "Scope Firewall  ·  built on Switch  ·  github.com/ru-ji/scope-firewall")),

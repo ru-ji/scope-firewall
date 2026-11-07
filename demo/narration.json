@@ -1,12 +1,50 @@
 [
- {"id": "s0_intro", "text": "Client projects slip when bug reports arrive mixed with new requests, and when dates are promised without counting the real work. Scope Firewall runs a client project from one team chat on Switch, from kickoff to delivery."},
- {"id": "s1_team", "text": "One template creates the whole team: five agents and four rooms, bridged to the team's Discord."},
- {"id": "s2_kickoff", "text": "At kickoff, the Planner turns the client brief into executable rules. Resetting the project and signing the contract both ask for an approval, right in the chat."},
- {"id": "s3_dates", "text": "Dates are never guessed. The tools propose them from the work: build, then test and confirm, one item at a time, on working days only. The developer corrects an estimate, the holiday is skipped, and the project manager accepts the date."},
- {"id": "s4_split", "text": "Later, the client sends one message with two requests. Reception has no access to the code. It splits them into two sheets and drafts the questions for the client."},
- {"id": "s5_verify", "text": "On GO, each sheet goes to two verifiers in separate rooms. Claude Code verifies and Codex cross-checks blind. Both run the signed contract against the app: a price of zero is a security defect."},
- {"id": "s6_plan", "text": "The Planner compares both verdicts. The free order becomes a hotfix, and the PDF export becomes a quote for the next version. The hotfix pushes the release, so the Planner proposes a delay, and only the project manager can accept it."},
- {"id": "s7_client", "text": "An unexpected event costs two more working days. The client update says what is free, what is billed, and every date with the reason it moved."},
- {"id": "s8_delivery", "text": "Delivery goes through staging. An approval from the developer does not count: only the tech lead can promote. And production still waits while a security rule fails."},
- {"id": "s9_outro", "text": "Humans decide, the tools check, and the chat keeps the record. Scope Firewall, built on Switch."}
+ {
+  "id": "s0_intro",
+  "text": "Client projects slip when bug reports arrive mixed with new requests, and when dates are promised without counting the real work. Scope Firewall runs a client project from one team chat on Switch, from kickoff to delivery."
+ },
+ {
+  "id": "s1_team",
+  "text": "One template creates the whole team: five agents and four rooms, bridged to the team's Discord."
+ },
+ {
+  "id": "s2_kickoff",
+  "text": "At kickoff, the Planner turns the client brief into executable rules. Resetting the project and signing the contract both ask for an approval, right in the chat."
+ },
+ {
+  "id": "s3_dates",
+  "text": "Dates are never guessed. The tools propose them from the work: build, then test and confirm, one item at a time, on working days only. The developer corrects an estimate, the holiday is skipped, and the project manager accepts the date."
+ },
+ {
+  "id": "s4_split",
+  "text": "Later, the client sends one message with two requests. Reception has no access to the code. It splits them into two sheets and drafts the questions for the client."
+ },
+ {
+  "id": "s5_verify",
+  "text": "On GO, each sheet goes to two verifiers in separate rooms. Claude Code verifies and Codex cross-checks blind. Both run the signed contract against the app: a price of zero is a security defect."
+ },
+ {
+  "id": "s6_plan",
+  "text": "The Planner compares both verdicts. The free order becomes a hotfix, and the PDF export is planned for the next version. The hotfix pushes the release, so the Planner proposes a delay, and only the project manager can accept it."
+ },
+ {
+  "id": "s6b_fix",
+  "text": "Then the Fixer does the work. It writes the fix, runs the contract, and opens a real pull request."
+ },
+ {
+  "id": "s6c_pr",
+  "text": "On GitHub, the change is one file and the checks are green. Nothing ships until a teammate reviews it."
+ },
+ {
+  "id": "s7_client",
+  "text": "An unexpected event costs two more working days. The client update lists what is being fixed, what is planned next, and every date with the reason it moved."
+ },
+ {
+  "id": "s8_delivery",
+  "text": "Delivery goes through staging. An approval from the developer does not count: only the tech lead can promote. And production still waits while a security rule fails."
+ },
+ {
+  "id": "s9_outro",
+  "text": "Humans decide, the tools check, and the chat keeps the record. Scope Firewall, built on Switch."
+ }
 ]
