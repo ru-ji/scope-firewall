@@ -1,6 +1,6 @@
-# Bug <id>
+# Request <id>
 - Client message (secrets masked), channel, date:
-- Reception class (bug | usage question | change request | unclear), urgent:
+- Reception class (bug | usage question | change request | unclear; one sheet per request), urgent:
 - Rule (F1 | F2 | none) and its text:
 - `contract.py verdict` output:
 - Verdict (defect | usage | out_of_scope | external | uncertain):

@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "ask": ["Bash(python3 tools/envs.py promote:*)", "Bash(python3 tools/envs.py rollback:*)"]
+  }
+}

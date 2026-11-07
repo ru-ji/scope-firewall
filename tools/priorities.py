@@ -4,6 +4,7 @@ Usage:
   priorities.py add <id> <verdict> <severity> <security yes|no> "<title>" [affected clients]
   priorities.py done <id>
   priorities.py plan [current hour]     ranked bugs, then the deliverables: releases with their contents
+  priorities.py client [current hour]   draft update for the client: included in the contract, billed, waiting for them
 
 Rank: security holes first, then severity (critical > high > medium > low), then clients affected, then oldest.
 Deliverables: every hotfix-lane bug ships in the next patch version, now; every patch-lane bug ships in the
@@ -35,7 +36,7 @@ def load(path=QUEUE):
     rows = []
     for line in open(path):
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if line.startswith("| B") and len(cells) == len(COLS):
+        if line.startswith("| R") and len(cells) == len(COLS):
             rows.append(dict(zip(COLS, cells)))
     return rows
 
@@ -46,8 +47,8 @@ def save(rows, path=QUEUE):
 
 
 def add(bid, verdict, severity, security, title, affected="0", path=QUEUE):
-    if not re.fullmatch(r"B\d+", bid):
-        raise SystemExit("id must look like B12")
+    if not re.fullmatch(r"R\d+[a-z]?", bid):
+        raise SystemExit("id must look like R12 or R12a")
     if verdict != "defect":
         raise SystemExit("only confirmed defects go in the bug queue; out_of_scope goes to VERSIONS.md")
     if severity not in SEVERITIES or security not in ("yes", "no") or not str(affected).isdigit():
@@ -160,6 +161,19 @@ def render(p):
     return "\n".join(out)
 
 
+def client_note(p):
+    """What the client needs to know, in their words: a draft a human reads and sends."""
+    titles = {b["Id"]: b["Title"] for b in p["bugs"]}
+    free = [f"- {r['version']}, {r['when']}: {', '.join(titles[i] for i in r['items'])}" for r in p["releases"]
+            if r["kind"] in ("hotfix", "patch")]
+    free += [f"- {r['version']}, in progress: {', '.join(r['items'])}" for r in p["releases"] if r["kind"] == "build"]
+    billed = [f"- {f['version']}: {f['request']} (accepted)" for f in p["features"] if f["status"] == "accepted"]
+    waiting = [f"- {f['version']}: {f['request']} (quote {f['id']})" for f in p["features"] if f["status"] != "accepted"]
+    return "\n".join(["DRAFT client update (a human sends it)", "Included in your contract, no extra cost:", *(free or ["- nothing open"]),
+                      "Outside the contract, billed separately:", *(billed or ["- nothing accepted"]),
+                      "Waiting for your written approval:", *(waiting or ["- nothing"])])
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     if a[:1] == ["add"] and len(a) in (6, 7):
@@ -168,6 +182,8 @@ if __name__ == "__main__":
     elif a[:1] == ["done"] and len(a) == 2:
         print(f"{a[1]} shipped in {done(a[1])}")
         print(render(make_plan(load())))
+    elif a[:1] == ["client"] and len(a) in (1, 2):
+        print(client_note(make_plan(load(), *(int(x) for x in a[1:2]))))
     elif a[:1] == ["plan"] and len(a) in (1, 2):
         print(render(make_plan(load(), *(int(x) for x in a[1:2]))))
     else:

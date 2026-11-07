@@ -73,7 +73,7 @@ assert sc.verify_change(base, fake, v)                                          
 
 # New project: blank contract and empty ledgers, the signed one is only replaced on request.
 open(os.path.join(d, "DECISIONS.md"), "w").write("# DECISIONS\n<!-- format -->\n2026-11-05 | B1 | x | y | z\n")
-open(os.path.join(d, "QUEUE.md"), "w").write("# QUEUE\n\n| Id |\n| --- |\n| B10 |\n")
+open(os.path.join(d, "QUEUE.md"), "w").write("# QUEUE\n\n| Id |\n| --- |\n| R10 |\n")
 try:
     sc.new(); raise AssertionError("a signed contract needs the flag")
 except SystemExit:
@@ -81,7 +81,7 @@ except SystemExit:
 sc.new(True, today)
 s = sc.load()
 assert not s["frozen"] and s["rules"] == [] and "Not signed yet" in open(os.path.join(d, "SCOPE.md")).read()
-assert "| B10 |" not in open(os.path.join(d, "QUEUE.md")).read() and "| B1 |" not in open(os.path.join(d, "DECISIONS.md")).read()
+assert "| R10 |" not in open(os.path.join(d, "QUEUE.md")).read() and "| B1 |" not in open(os.path.join(d, "DECISIONS.md")).read()
 assert "CR-001" not in open(v).read() and "| MVP |" in open(v).read()
 assert sc.verify_change(base, s, v) == []                                       # replacing is a declared act, not a hand edit
 json.dump([rule("F1", "a")], open(draft, "w"))
