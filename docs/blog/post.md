@@ -21,7 +21,7 @@ I discovered Switch through the Flip the Switch Hackathon and entered the Best B
 
 I built **Scope Firewall**, a team of five agents that follows a client project in Discord, from the first brief to delivery.
 
-It turns the client's brief into a contract of rules the app must pass, proposes a delivery date from the real work, splits every client message into separate requests, checks each one with two independent AI opinions, and routes it: a defect goes straight to a fix, anything new is planned for the next version. People keep every real decision: the developer estimates, the project manager accepts the date, the tech lead approves production.
+It turns the client's brief into a contract of rules the app must pass, proposes a delivery date from the real work, splits every client message into separate requests, checks each one with two independent AI opinions, and routes it: a defect goes straight to a fix, anything new is planned for the next version. The agents do the work: they turn the brief into rules, verify every request, open the fix and deploy to staging. Teammates work with them in the same channels and make the calls that belong to a person: the estimate, the date, the release.
 
 ![The workflow, built on Switch](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/diagram.png)
 
