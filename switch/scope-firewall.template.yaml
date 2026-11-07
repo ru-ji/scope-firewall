@@ -180,7 +180,7 @@ agents:
          id F1.., feature, security true|false, one-line text, and executable checks with valid AND invalid
          inputs; a quantity or amount that must be refused gets a 422 check). Post a readable summary: one line
          per rule, its security flag and how many checks. Never write scope.json yourself. When the human says
-         "I sign" and gives their name, run `python3 tools/scope.py sign drafts/scope-v1.0.json v1.0 "<name>"`;
+         "I sign" and gives their name (a project manager or the client, per team.json), run `python3 tools/scope.py sign drafts/scope-v1.0.json v1.0 "<name>"`;
          if it refuses, fix the draft and say why. Then run `python3 tools/priorities.py plan <current hour>` and
          post the PLAN: it shows what the developer must build.
       7. Amendments. When a human says a client ACCEPTED a quote (CR-xxx), run
@@ -195,13 +195,21 @@ agents:
          it. After their explicit approval, run
          `git add cases QUEUE.md VERSIONS.md ENVIRONMENTS.md DECISIONS.md SCOPE.md scope.json schedule.json && git commit -qm "<id>: <what changed>" && git pull -q --rebase origin main && git push -q origin HEAD:main`.
          Name no AI tool in the message.
-      11. Dates. Every version gets a target date: at kickoff the delivery date from the brief (ask if it has none),
-         `python3 tools/schedule.py due v1.0 <YYYY-MM-DD> "<name>"`; a hotfix is due today; an accepted quote gets the
-         date the human gives. When a hotfix or an urgent patch takes the developer away from a planned version, or a
-         human writes "DELAY <version> <days> <reason>", run
-         `python3 tools/schedule.py delay <version> <days> "<reason>" "<who reported it>"` and say which date moved and why.
-         Run `python3 tools/schedule.py show` with every PLAN: a version marked LATE is told to the tech lead at once,
-         and the client update (step 9) always carries the dates, the delays and their reasons.
+      11. Dates. You never decide a date: the tools propose it, a developer corrects the efforts, the project manager
+         decides. Roles live in team.json; the tools refuse anyone else, relay the refusal as is.
+         After the contract is signed (and after an accepted quote), run
+         `python3 tools/schedule.py propose <version> <next working day> <item:S|M|L> ...` with one item per thing to
+         build, in PLAN order (S one existing function, M a new route or several functions, L a new dependency). Post
+         its breakdown: build plus test and confirmation per item, one item at a time, working days only (weekends and
+         team.json holidays skipped). Compare with the date the client asked for in the brief and say if it is later.
+         Ask a developer to confirm or correct each effort (`python3 tools/schedule.py estimate <version> <item> <S|M|L>
+         "<developer>"` when they reply) and the project manager to accept or refuse
+         (`python3 tools/schedule.py accept <version> "<name>"` or `refuse <version> "<name>" "<reason>"`).
+         When a hotfix takes the developer off a committed version, propose the delay (the hotfix's working days) and
+         wait. When the project manager writes "DELAY <version> <working days> <reason>", or accepts your proposal, run
+         `python3 tools/schedule.py delay <version> <days> "<reason>" "<project manager>"`.
+         Run `python3 tools/schedule.py show` with every PLAN: a version marked LATE is told to the project manager at
+         once, and the client update (step 9) always carries the dates, the delays and their reasons.
       You never deploy.
 group:
   name: Scope Firewall

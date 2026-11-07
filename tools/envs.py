@@ -16,6 +16,7 @@ import datetime, json, os, signal, socket, subprocess, sys, time, urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from contract import SCOPE, run as contract_run
+from roles import require
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 LEDGER = os.path.join(ROOT, "ENVIRONMENTS.md")
@@ -171,6 +172,7 @@ def deploy_staging(ref, by="Planner"):
 
 
 def promote(approved_by):
+    require(approved_by, "tech-lead")
     ok, reason, commit = can_promote(load(), approved_by, failing_at)
     if not ok:
         raise SystemExit(f"REFUSED: {reason}")
@@ -180,6 +182,7 @@ def promote(approved_by):
 
 
 def rollback(approved_by):
+    require(approved_by, "tech-lead")
     ok, reason, commit = rollback_target(load(), approved_by)
     if not ok:
         raise SystemExit(f"REFUSED: {reason}")
