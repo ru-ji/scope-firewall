@@ -1,67 +1,53 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons@5.0.5/css/framework7-icons.css">
 <style>
 *{box-sizing:border-box;margin:0}
-body{width:1800px;height:760px;font-family:"Open Sans",-apple-system,system-ui,sans-serif;position:relative;overflow:hidden;
- background-color:#f8f8fc;background-image:linear-gradient(#e9e9f5 1px,transparent 1px),linear-gradient(90deg,#e9e9f5 1px,transparent 1px);background-size:44px 44px}
+html,body{background:transparent}
+body{width:1760px;height:640px;font-family:-apple-system,"SF Pro Text",system-ui,sans-serif;position:relative;overflow:hidden}
 svg.edges{position:absolute;inset:0}
-.node{position:absolute;width:88px;height:88px;margin:-44px 0 0 -44px;background:#fff;border:1.5px dashed;border-radius:18px;display:grid;place-items:center}
-.node.trigger{border-radius:44px 18px 18px 44px}
-.node i.ph-fill{font-size:42px}
-.in{position:absolute;left:-5px;top:35px;width:8px;height:18px;background:#7c7c84;border-radius:2px}
-.out{position:absolute;right:-11px;width:20px;height:20px;border-radius:50%;background:#55555c}
-.cap{position:absolute;width:200px;margin-left:-100px;text-align:center}
-.cap b{display:block;font-size:15.5px;font-weight:500;color:#2d2e36}
-.cap small{display:block;font-size:12px;color:#8a8b94;margin-top:3px}
-.branch{position:absolute;font-size:11px;color:#6b6c75}
-.plus{position:absolute;right:28px;top:22px;width:44px;height:44px;border-radius:50%;background:#ff6d5a;color:#fff;font-size:30px;display:grid;place-items:center;font-weight:300}
-.zoom{position:absolute;left:22px;bottom:22px;display:flex;gap:6px}
-.zoom span{width:34px;height:34px;background:#fff;border-radius:8px;display:grid;place-items:center;color:#55555c;font-size:18px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.run{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:#ff6d5a;color:#fff;font-size:14px;font-weight:600;border-radius:22px;padding:10px 20px;display:flex;align-items:center;gap:8px}
-.title{position:absolute;left:28px;top:24px;font-size:16px;color:#55555c}
-.title b{color:#2d2e36;font-weight:600}
+.node{position:absolute;width:84px;height:84px;margin:-42px 0 0 -42px;background:#fff;border:1px solid #e6e7ee;border-radius:22px;
+ display:grid;place-items:center;box-shadow:0 6px 18px rgba(30,32,60,.08)}
+.node .f7-icons{font-size:38px}
+.logo{width:40px;height:40px;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center}
+.cap{position:absolute;width:190px;margin-left:-95px;text-align:center}
+.cap b{display:block;font-size:15px;font-weight:600;color:#23252f}
+.cap small{display:block;font-size:12.5px;color:#9093a3;margin-top:3px}
+.tag{position:absolute;transform:translate(-50%,-50%);font-size:11.5px;color:#9093a3;background:#fff;padding:1px 6px;border-radius:8px}
 </style></head><body>
-<div class="title"><b>Scope Firewall</b> &nbsp;·&nbsp; client project, from kickoff to delivery</div>
-<div class="plus">+</div>
-<svg class="edges" width="1800" height="760"><defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#3b4256"/></marker></defs></svg>
-<div id="nodes"></div>
-<div class="zoom"><span><i class="ph-fill ph-magnifying-glass-plus"></i></span><span><i class="ph-fill ph-magnifying-glass-minus"></i></span></div>
-<div class="run"><i class="ph-fill ph-play-circle"></i>Execute Workflow</div>
+<svg class="edges" width="1760" height="640"></svg>
+<div id="n"></div>
 <script>
-// id, x, y, icon, color, border, title, parameter, trigger
+const S=n=>`https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/${n}.svg`;
+// id, x, y, icon (f7 name or logo:simple-icon), color, title, detail
 const N=[
-["brief",110,170,"discord-logo","#5865F2","#5865F2","Client brief","#planning",1],
-["draft",300,170,"file-text","#6d4aff","#6d4aff","Planner","draft: contract rules"],
-["sign",490,170,"pen-nib","#e8792b","#e8792b","Sign contract","approval: in chat"],
-["dates",680,170,"calendar-check","#1f9d55","#1f9d55","Propose dates","working days + tests"],
-["dev",870,170,"code","#e8792b","#e8792b","Developer","estimate: F5 is M"],
-["pm",1060,170,"seal-check","#e8792b","#e8792b","Project manager","accept: date"],
-["msg",110,440,"discord-logo","#5865F2","#5865F2","Client message","#client-requests",1],
-["rec",300,440,"git-fork","#6d4aff","#6d4aff","Reception","split: one sheet per request"],
-["ver",490,350,"shield-check","#d97757","#d97757","Verifier","Claude Code · contract.py"],
-["con",490,530,"open-ai-logo","#111","#555","Contradictor","Codex · blind room"],
-["cmp",690,440,"signpost","#2e9e3e","#2e9e3e","Compare verdicts","compare.py"],
-["fix",890,350,"lightning","#e5484d","#e5484d","Hotfix","defect: free"],
-["stage",1080,350,"hard-drives","#1f9d55","#1f9d55","Staging","deploy: contract checked"],
-["lead",1270,350,"signpost","#2e9e3e","#2e9e3e","Tech lead?","roles: team.json"],
-["prod",1470,290,"rocket-launch","#1f9d55","#1f9d55","Production","Allow in chat"],
-["hold",1470,440,"hand-palm","#e5484d","#e5484d","Refuse","developer cannot promote"],
-["quote",890,530,"receipt","#1f9d55","#1f9d55","Quote","feature: next version"],
-["upd",1080,530,"paper-plane-tilt","#e8792b","#e8792b","Client update","dates + every reason"]];
+["brief",80,110,"logo:discord","#5865F2","Client brief","#planning"],
+["draft",270,110,"doc_checkmark_fill","#7c5cff","Planner","drafts the rules"],
+["sign",460,110,"signature","#f08a24","Signature","in the chat"],
+["dates",650,110,"calendar_badge_plus","#22a06b","Dates","working days + tests"],
+["dev",840,110,"hammer_fill","#f08a24","Developer","corrects the estimate"],
+["pm",1030,110,"checkmark_seal_fill","#f08a24","Project manager","accepts the date"],
+["msg",80,400,"logo:discord","#5865F2","Client message","#client-requests"],
+["rec",270,400,"arrow_branch","#7c5cff","Reception","one sheet per request"],
+["ver",460,310,"logo:claude","#d97757","Verifier","Claude Code"],
+["con",460,490,"logo:openai","#111111","Contradictor","Codex, blind"],
+["cmp",650,400,"arrow_merge","#22a06b","Compare","both must agree"],
+["fix",840,310,"bolt_fill","#e5484d","Hotfix","free"],
+["stage",1030,310,"cube_box_fill","#22a06b","Staging","contract checked"],
+["lead",1220,310,"person_crop_circle_fill_badge_checkmark","#f08a24","Tech lead","only one who promotes"],
+["prod",1410,230,"rocket_fill","#22a06b","Production","Allow in chat"],
+["hold",1410,400,"hand_raised_fill","#e5484d","Refused","anyone else"],
+["quote",840,490,"tag_fill","#22a06b","Quote","next version"],
+["upd",1030,490,"paperplane_fill","#f08a24","Client update","dates + reasons"]];
 const E=[["brief","draft"],["draft","sign"],["sign","dates"],["dates","dev"],["dev","pm"],
-["msg","rec"],["rec","ver"],["rec","con"],["ver","cmp"],["con","cmp"],["cmp","fix","t"],["cmp","quote","f"],
-["fix","stage"],["stage","lead"],["lead","prod","t"],["lead","hold","f"],["quote","upd"]];
-const P={},box=document.getElementById("nodes"),svg=document.querySelector("svg.edges");
-const ifs=new Set(["cmp","lead"]);
-for(const [id,x,y,ic,col,bd,t,p,tr] of N){P[id]=[x,y];
- const outs=ifs.has(id)?`<i class="out" style="top:18px"></i><i class="out" style="top:50px"></i>`:`<i class="out" style="top:34px"></i>`;
- box.insertAdjacentHTML("beforeend",`<div class="node ${tr?"trigger":""}" style="left:${x}px;top:${y}px;border-color:${bd}">
- <i class="ph-fill ph-${ic}" style="color:${col}"></i>${tr?"":'<i class="in"></i>'}${outs}</div>
- <div class="cap" style="left:${x}px;top:${y+52}px"><b>${t}</b><small>${p}</small></div>`);
- if(ifs.has(id))box.insertAdjacentHTML("beforeend",`<div class="branch" style="left:${x+50}px;top:${y-46}px">${id=="cmp"?"defect":"true"}</div>
- <div class="branch" style="left:${x+50}px;top:${y+30}px">${id=="cmp"?"feature":"false"}</div>`);}
-for(const [a,b,br] of E){const [x1,y1]=P[a],[x2,y2]=P[b];
- const sy=y1+(br=="t"?-16:br=="f"?16:0),sx=x1+54,ex=x2-50,mx=(sx+ex)/2;
- svg.insertAdjacentHTML("beforeend",`<path d="M${sx} ${sy} C${mx} ${sy} ${mx} ${y2} ${ex} ${y2}" stroke="#3b4256" stroke-width="2" fill="none" marker-end="url(#a)"/>`);}
+["msg","rec"],["rec","ver"],["rec","con"],["ver","cmp"],["con","cmp"],["cmp","fix","defect"],["cmp","quote","feature"],
+["fix","stage"],["stage","lead"],["lead","prod"],["lead","hold"],["quote","upd"]];
+const P={},n=document.getElementById("n"),svg=document.querySelector("svg.edges");
+for(const [id,x,y,ic,c,t,s] of N){P[id]=[x,y];
+ const inner=ic.startsWith("logo:")?`<div class="logo" style="background:${c};-webkit-mask-image:url(${S(ic.slice(5))})"></div>`:`<i class="f7-icons" style="color:${c}">${ic}</i>`;
+ n.insertAdjacentHTML("beforeend",`<div class="node" style="left:${x}px;top:${y}px">${inner}</div><div class="cap" style="left:${x}px;top:${y+54}px"><b>${t}</b><small>${s}</small></div>`);}
+for(const [a,b,lab] of E){const [x1,y1]=P[a],[x2,y2]=P[b],sx=x1+46,ex=x2-50,mx=(sx+ex)/2;
+ svg.insertAdjacentHTML("beforeend",`<path d="M${sx} ${y1} C${mx} ${y1} ${mx} ${y2} ${ex} ${y2}" stroke="#c4c6d3" stroke-width="2" fill="none" stroke-linecap="round"/>
+ <path d="M${ex-6} ${y2-5} L${ex} ${y2} L${ex-6} ${y2+5}" stroke="#c4c6d3" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`);
+ if(lab)n.insertAdjacentHTML("beforeend",`<div class="tag" style="left:${mx}px;top:${(y1+y2)/2}px">${lab}</div>`);}
 </script></body></html>
