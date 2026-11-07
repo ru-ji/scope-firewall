@@ -13,7 +13,10 @@ W, H, PAD, FADE = 1920, 1080, 0.6, 0.35
 BG, INK, MUTED = (245, 245, 247), (29, 29, 31), (134, 134, 139)
 # the recording is already a real macOS window (title bar included): it is shown at this height, centred
 WY, CH = 128, 900
-ASPECT = {"discord": 2848 / 1768, "console": 2800 / 1800}
+# Discord is cropped to the conversation (no server icons, no channel list) and gets a minimal title bar
+CROP = {"discord": "crop=2098:1700:750:68,", "console": ""}
+ASPECT = {"discord": 2098 / 1700, "console": 2800 / 1800}
+BAR = {"discord": 40, "console": 0}
 
 SCENES = {  # id: (source, [(start, end), ...], caption)
     "s0_intro": (None, [], ("Scope Firewall", "A client project team of AI agents, built on Switch")),
@@ -39,16 +42,25 @@ def font(size, bold=False):
     return f
 
 
-def frame(path, ww):
-    """Light background and a soft shadow; the window area (rounded corners) is left transparent."""
+def frame(path, ww, bar):
+    """Light background, soft shadow, optional title bar; the recording area is left transparent."""
     wx, r = (W - ww) // 2, 16
     im = Image.new("RGBA", (W, H), BG + (255,))
     sh = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     ImageDraw.Draw(sh).rounded_rectangle((wx, WY + 18, wx + ww, WY + CH + 18), r, fill=(0, 0, 0, 80))
     im.alpha_composite(sh.filter(ImageFilter.GaussianBlur(30)))
-    hole = Image.new("L", (W, H), 255)
-    ImageDraw.Draw(hole).rounded_rectangle((wx, WY, wx + ww - 1, WY + CH - 1), r, fill=0)
-    im.putalpha(Image.composite(im.getchannel("A"), Image.new("L", (W, H), 0), hole))
+    win = Image.new("L", (W, H), 0)
+    ImageDraw.Draw(win).rounded_rectangle((wx, WY, wx + ww - 1, WY + CH - 1), r, fill=255)
+    d = ImageDraw.Draw(im)
+    if bar:
+        d.rounded_rectangle((wx, WY, wx + ww - 1, WY + bar + r), r, fill=(30, 31, 34, 255))
+        for i, c in enumerate([(255, 95, 87), (254, 188, 46), (40, 200, 64)]):
+            x = wx + 22 + i * 20
+            d.ellipse((x - 6, WY + bar / 2 - 6, x + 6, WY + bar / 2 + 6), fill=c)
+    hole = win.copy()
+    ImageDraw.Draw(hole).rectangle((0, 0, W, WY + bar - 1), fill=0)  # the bar stays opaque
+    alpha = Image.composite(Image.new("L", (W, H), 0), im.getchannel("A"), hole)
+    im.putalpha(alpha)
     im.save(path)
 
 
@@ -90,14 +102,15 @@ def scene(sid, src, windows, text, i):
         return out
     cap, frame_png = os.path.join(TMP, f"cap{i}.png"), os.path.join(TMP, f"frame_{src}.png")
     caption(text, cap)
-    ww = round(CH * ASPECT[src] / 2) * 2
-    frame(frame_png, ww)
+    bar = BAR[src]
+    ww = round((CH - bar) * ASPECT[src] / 2) * 2
+    frame(frame_png, ww, bar)
     speed = sum(e - s for s, e in windows) / dur
     parts = "".join(f"[0:v]trim={s}:{e},setpts=PTS-STARTPTS[p{k}];" for k, (s, e) in enumerate(windows))
     graph = (parts + "".join(f"[p{k}]" for k in range(len(windows))) + f"concat=n={len(windows)}:v=1:a=0[j];"
-             f"[j]setpts=PTS/{speed:.4f},fps=30,scale={ww}:{CH}:flags=lanczos[v];"
+             f"[j]{CROP[src]}setpts=PTS/{speed:.4f},fps=30,scale={ww}:{CH - bar}:flags=lanczos[v];"
              f"color=c=0x{BG[0]:02x}{BG[1]:02x}{BG[2]:02x}:s={W}x{H}:r=30[bg];"
-             f"[bg][v]overlay={(W - ww) // 2}:{WY}:shortest=1[b];[b][2:v]overlay=0:0[c];[c][3:v]overlay=0:0,{fades}[o]")
+             f"[bg][v]overlay={(W - ww) // 2}:{WY + bar}:shortest=1[b];[b][2:v]overlay=0:0[c];[c][3:v]overlay=0:0,{fades}[o]")
     run("-i", os.path.join(RAW, src + ".mp4"), "-i", wav, "-loop", "1", "-i", frame_png, "-loop", "1", "-i", cap,
         "-filter_complex", graph, "-map", "[o]", "-map", "1:a", "-af", afade, *enc, out)
     return out
