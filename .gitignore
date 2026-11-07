@@ -4,3 +4,4 @@ __pycache__/
 demo/frames/c*.jpg
 .envs/
 .worktrees/
+.env
