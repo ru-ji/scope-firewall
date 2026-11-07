@@ -130,8 +130,8 @@ For your own project, replace `demo-app/app.py`: keep the `H` request handler, b
 ## Limits
 
 - Which rule a message maps to is decided by an LLM: that is why two providers check it and a human settles any disagreement.
-- Verified in Switch Console 0.40.1 on Mattermost: template import, the split into R12a and R12b, `GO`, `COMPARE`, severity confirmation, plan, and the ledger push after approval. In that run every agent was on Codex, so the two-provider setup itself was not part of it.
-- Not run in Switch yet: the Allow / Decline prompt for production, which relies on a Claude Code permission rule. `envs.py` always requires a named approval.
+- Verified in Switch Console 0.40.1 on Mattermost, with Claude Code and Codex: template import, the split into R12a and R12b, `GO`, `COMPARE` (both providers agreed on F5), staging deploy, and the Allow / Decline prompt before `envs.py promote`. An earlier all-Codex run also covered severity confirmation, the plan and the ledger push after approval.
+- The Allow / Decline prompt for production comes from a Claude Code permission rule in `.claude/settings.json`; with another provider, `envs.py` still requires a named approval.
 - OpenCode 2.2.0 was refused by Switch Console 0.40.1: its sign-in check could not read the OpenCode server's reply.
 - The sample app is small: six rules, eleven checks. Checks over HTTP work with any app; in-process checks and `envs.py` expect a Python app with an `H` handler.
 - `envs.py` runs both environments as local processes on one machine, on ports 8080 and 8081.
