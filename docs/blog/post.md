@@ -15,13 +15,13 @@ A few things make it more than a chatbot in a channel. Rooms decide who sees wha
 
 ## How I came to it
 
-I discovered Switch through the Flip the Switch Hackathon and entered the Best Business Workflow track. I wanted to test it on a problem I know well from client work: a client sends one message that mixes a bug report with a new feature request, and the team loses time sorting out what is owed for free and what should be billed.
+I discovered Switch through the Flip the Switch Hackathon and entered the Best Business Workflow track. I wanted to test it on a problem I know well from client work: a client sends one message that mixes a bug report with a new feature request, and the team loses time working out what each part is and where it should go.
 
 ## What I built with it
 
 I built **Scope Firewall**, a team of five agents that follows a client project in Discord, from the first brief to delivery.
 
-It turns the client's brief into a contract of rules the app must pass, proposes a delivery date from the real work, splits every client message into separate requests, checks each one with two independent AI opinions, and sorts it into a free fix or a paid quote. People keep every real decision: the developer estimates, the project manager accepts the date, the tech lead approves production.
+It turns the client's brief into a contract of rules the app must pass, proposes a delivery date from the real work, splits every client message into separate requests, checks each one with two independent AI opinions, and routes it: a defect goes straight to a fix, anything new is planned for the next version. People keep every real decision: the developer estimates, the project manager accepts the date, the tech lead approves production.
 
 ![The workflow, built on Switch](https://raw.githubusercontent.com/ru-ji/scope-firewall/docs/blog-post/docs/blog/diagram.png)
 

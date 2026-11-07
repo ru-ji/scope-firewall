@@ -20,8 +20,8 @@ const S=n=>`https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/${n}.svg`;
 // id, x, y, logo or [title, note]
 const N=[["msg",70,180,"discord"],["rec",205,180,["Reception","splits it"]],
 ["ver",350,115,"claude"],["con",350,245,"openai"],["cmp",490,180,["Compare","both agree"]],
-["fix",640,115,["Hotfix","free"]],["lead",800,115,["Tech lead","approves"]],["prod",975,115,["Production",""]],
-["quote",640,245,["Quote","billed"]],["upd",800,245,["Client update","with reasons"]]];
+["fix",640,115,["Hotfix","fix now"]],["lead",800,115,["Tech lead","approves"]],["prod",975,115,["Production",""]],
+["quote",655,245,["Next version","planned"]],["upd",860,245,["Client update","with reasons"]]];
 const E=[["msg","rec"],["rec","ver"],["rec","con"],["ver","cmp"],["con","cmp"],["cmp","fix","defect"],["cmp","quote","feature"],["fix","lead"],["lead","prod"],["quote","upd"]];
 const P={},n=document.getElementById("n"),svg=document.querySelector("svg");
 for(const [id,x,y,v] of N){P[id]=[x,y];
