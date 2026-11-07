@@ -1,52 +1,32 @@
 <!doctype html>
-<html><head><meta charset="utf-8">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons@5.0.5/css/framework7-icons.css">
-<style>
+<html><head><meta charset="utf-8"><style>
 *{box-sizing:border-box;margin:0}
 html,body{background:transparent}
-body{width:1760px;height:640px;font-family:-apple-system,"SF Pro Text",system-ui,sans-serif;position:relative;overflow:hidden}
-svg.edges{position:absolute;inset:0}
-.node{position:absolute;width:84px;height:84px;margin:-42px 0 0 -42px;background:#fff;border:1px solid #e6e7ee;border-radius:22px;
- display:grid;place-items:center;box-shadow:0 6px 18px rgba(30,32,60,.08)}
-.node .f7-icons{font-size:38px}
-.logo{width:40px;height:40px;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center}
-.cap{position:absolute;width:190px;margin-left:-95px;text-align:center}
-.cap b{display:block;font-size:15px;font-weight:600;color:#23252f}
-.cap small{display:block;font-size:12.5px;color:#9093a3;margin-top:3px}
-.tag{position:absolute;transform:translate(-50%,-50%);font-size:11.5px;color:#9093a3;background:#fff;padding:1px 6px;border-radius:8px}
+body{width:1600px;height:380px;font-family:-apple-system,"SF Pro Text",system-ui,sans-serif;position:relative;overflow:hidden}
+svg{position:absolute;inset:0}
+.pill{position:absolute;transform:translate(-50%,-50%);height:46px;padding:0 22px;border-radius:23px;display:flex;align-items:center;
+ font-size:17px;font-weight:600;color:#fff;white-space:nowrap;letter-spacing:.01em}
+.person{background:#e8833a}.agent{background:#6366f1}.tool{background:#16a34a}
+.lab{position:absolute;transform:translate(-50%,-50%);font-size:13px;font-weight:600;color:#8b8f9c}
+.legend{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);display:flex;gap:26px;font-size:14px;font-weight:600;color:#8b8f9c}
+.legend span{display:flex;align-items:center;gap:8px}.legend i{width:12px;height:12px;border-radius:6px}
 </style></head><body>
-<svg class="edges" width="1760" height="640"></svg>
-<div id="n"></div>
+<svg width="1600" height="380"></svg><div id="n"></div>
+<div class="legend"><span><i class="person"></i>a person decides</span><span><i class="agent"></i>an agent works</span><span><i class="tool"></i>a tool checks</span></div>
 <script>
-const S=n=>`https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/${n}.svg`;
-// id, x, y, icon (f7 name or logo:simple-icon), color, title, detail
-const N=[
-["brief",80,110,"logo:discord","#5865F2","Client brief","#planning"],
-["draft",270,110,"doc_checkmark_fill","#7c5cff","Planner","drafts the rules"],
-["dates",460,110,"calendar_badge_plus","#22a06b","Dates","working days + tests"],
-["dev",650,110,"hammer_fill","#f08a24","Developer","corrects the estimate"],
-["pm",840,110,"checkmark_seal_fill","#f08a24","Project manager","accepts the date"],
-["msg",80,400,"logo:discord","#5865F2","Client message","#client-requests"],
-["rec",270,400,"arrow_branch","#7c5cff","Reception","one sheet per request"],
-["ver",460,310,"logo:claude","#d97757","Verifier","Claude Code"],
-["con",460,490,"logo:openai","#111111","Contradictor","Codex, blind"],
-["cmp",650,400,"arrow_merge","#22a06b","Compare","both must agree"],
-["fix",840,310,"bolt_fill","#e5484d","Hotfix","free"],
-["stage",1030,310,"cube_box_fill","#22a06b","Staging","contract checked"],
-["lead",1220,310,"person_crop_circle_fill_badge_checkmark","#f08a24","Tech lead","only one who promotes"],
-["prod",1410,230,"rocket_fill","#22a06b","Production","Allow in chat"],
-["hold",1410,400,"hand_raised_fill","#e5484d","Refused","anyone else"],
-["quote",840,490,"tag_fill","#22a06b","Quote","next version"],
-["upd",1030,490,"paperplane_fill","#f08a24","Client update","dates + reasons"]];
-const E=[["brief","draft"],["draft","dates"],["dates","dev"],["dev","pm"],
-["msg","rec"],["rec","ver"],["rec","con"],["ver","cmp"],["con","cmp"],["cmp","fix","defect"],["cmp","quote","feature"],
-["fix","stage"],["stage","lead"],["lead","prod"],["lead","hold"],["quote","upd"]];
-const P={},n=document.getElementById("n"),svg=document.querySelector("svg.edges");
-for(const [id,x,y,ic,c,t,s] of N){P[id]=[x,y];
- const inner=ic.startsWith("logo:")?`<div class="logo" style="background:${c};-webkit-mask-image:url(${S(ic.slice(5))})"></div>`:`<i class="f7-icons" style="color:${c}">${ic}</i>`;
- n.insertAdjacentHTML("beforeend",`<div class="node" style="left:${x}px;top:${y}px">${inner}</div><div class="cap" style="left:${x}px;top:${y+54}px"><b>${t}</b><small>${s}</small></div>`);}
-for(const [a,b,lab] of E){const [x1,y1]=P[a],[x2,y2]=P[b],sx=x1+46,ex=x2-50,mx=(sx+ex)/2;
- svg.insertAdjacentHTML("beforeend",`<path d="M${sx} ${y1} C${mx} ${y1} ${mx} ${y2} ${ex} ${y2}" stroke="#c4c6d3" stroke-width="2" fill="none" stroke-linecap="round"/>
- <path d="M${ex-6} ${y2-5} L${ex} ${y2} L${ex-6} ${y2+5}" stroke="#c4c6d3" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`);
- if(lab)n.insertAdjacentHTML("beforeend",`<div class="tag" style="left:${mx}px;top:${(y1+y2)/2}px">${lab}</div>`);}
+const N=[["brief",110,50,"person","Client brief"],["plan",320,50,"agent","Planner"],["dates",510,50,"tool","Dates"],
+["dev",700,50,"person","Developer"],["pm",920,50,"person","Project manager"],
+["msg",110,220,"person","Client message"],["rec",330,220,"agent","Reception"],
+["ver",540,160,"agent","Claude Code"],["con",540,280,"agent","Codex"],["cmp",750,220,"tool","Compare"],
+["fix",960,160,"tool","Hotfix"],["quote",960,280,"tool","Quote"],["stage",1140,160,"tool","Staging"],
+["lead",1330,160,"person","Tech lead"],["prod",1510,160,"tool","Production"],["upd",1160,280,"person","Client update"]];
+const E=[["brief","plan"],["plan","dates"],["dates","dev"],["dev","pm"],["msg","rec"],["rec","ver"],["rec","con"],
+["ver","cmp"],["con","cmp"],["cmp","fix","defect"],["cmp","quote","feature"],["fix","stage"],["stage","lead"],["lead","prod"],["quote","upd"]];
+const P={},n=document.getElementById("n"),svg=document.querySelector("svg");
+for(const [id,x,y,k,t] of N){P[id]=[x,y];n.insertAdjacentHTML("beforeend",`<div class="pill ${k}" id="${id}" style="left:${x}px;top:${y}px">${t}</div>`);}
+const W=id=>document.getElementById(id).offsetWidth/2;
+for(const [a,b,lab] of E){const [x1,y1]=P[a],[x2,y2]=P[b],sx=x1+W(a)+8,ex=x2-W(b)-10,mx=(sx+ex)/2;
+ svg.insertAdjacentHTML("beforeend",`<path d="M${sx} ${y1} C${mx} ${y1} ${mx} ${y2} ${ex} ${y2}" stroke="#8b8f9c" stroke-width="2" fill="none" stroke-linecap="round"/>
+ <path d="M${ex-6} ${y2-5} L${ex} ${y2} L${ex-6} ${y2+5}" stroke="#8b8f9c" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`);
+ if(lab)n.insertAdjacentHTML("beforeend",`<div class="lab" style="left:${mx-34}px;top:${y2<y1?y2+4:y2-4}px">${lab}</div>`);}
 </script></body></html>
