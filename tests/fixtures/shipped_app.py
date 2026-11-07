@@ -1,4 +1,4 @@
-"""Frozen copy of demo-app/app.py as shipped in v2.3.1 (with the B01/B03/B09 defects). Tests prove the contract catches these defects; demo-app/ itself can then be fixed without breaking the tests."""
+"""Frozen copy of demo-app/app.py as shipped in v1.0.0 (with the R01/R03/R09 defects). Tests prove the contract catches these defects; demo-app/ itself can then be fixed without breaking the tests."""
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 

@@ -15,7 +15,7 @@ ok, reason, commit = can_promote(load(p), "asher")
 assert ok and commit == "aaa0001" and "baseline" in reason, reason        # first promotion = production baseline
 record("production", "aaa0001", 8, 11, ["F5", "F6"], "approved by asher", path=p)
 
-record("staging", "bbb0002", 10, 11, ["F5"], "Planner", path=p)          # hotfix B11: F6 fixed, display bug F5 still open
+record("staging", "bbb0002", 10, 11, ["F5"], "Planner", path=p)          # hotfix R11: F6 fixed, display bug F5 still open
 ok, reason, commit = can_promote(load(p), "asher")
 assert ok and commit == "bbb0002" and "fixes F6" in reason, reason        # the hotfix ships while F5 waits for its patch
 record("production", "bbb0002", 10, 11, ["F5"], "approved by asher", path=p)

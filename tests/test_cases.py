@@ -9,7 +9,7 @@ import shipped_app as app  # frozen copy of the shipped app, so fixing demo-app/
 from contract import verdict
 from triage_lane import lane
 
-cases = json.load(open("bugs/cases.json"))
+cases = json.load(open("cases/cases.json"))
 assert len({c["id"] for c in cases}) == len(cases)
 assert sorted(c["demo"] for c in cases if "demo" in c) == [1, 2, 3, 4, 5, 6]
 
@@ -29,6 +29,11 @@ for c in cases:
         assert verdict(c["rule"], "--local=tests/fixtures/shipped_app.py")["verdict"] == v["verdict"], (c["id"], "--local and HTTP must agree")
     got = lane(c["expected_verdict"], c["severity"], c["security"])["lane"]
     assert got == c["expected_lane"], (c["id"], got)
+
+# One client message, two fates: the mixed message splits into free work and billed work.
+mixed = [c for c in cases if c.get("mixed") == "R12"]
+assert len(mixed) == 2 and len({c["report"] for c in mixed}) == 1
+assert [c["expected_lane"] for c in mixed] == ["patch", "backlog"]
 
 s.shutdown()
 print("ok")

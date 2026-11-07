@@ -6,7 +6,7 @@
 2026-11-03 09:25:10 INFO POST /pay 200 user=u415
 2026-11-03 09:30:10 INFO POST /pay 200 user=u820
 2026-11-03 09:35:10 INFO POST /pay 200 user=u968
-2026-11-03 09:40:01 INFO deploy version=v2.3.1 service=payments
+2026-11-03 09:40:01 INFO deploy version=v1.0.0 service=payments
 2026-11-03 09:42:36 ERROR POST /pay 500 TypeError: unsupported operand type(s) for *: 'int' and 'NoneType' user=u967
 2026-11-03 09:42:51 ERROR POST /pay 500 TypeError: unsupported operand type(s) for *: 'int' and 'NoneType' user=u882
 2026-11-03 09:43:16 ERROR POST /pay 500 TypeError: unsupported operand type(s) for *: 'int' and 'NoneType' user=u220

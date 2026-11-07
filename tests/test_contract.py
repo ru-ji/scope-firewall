@@ -35,7 +35,7 @@ app.H.log_message = lambda *a: None
 demo, url = serve(app.H)
 good, good_url = serve(Correct)
 
-# Demo app as shipped: F1 holds; F2 (B01), F3 (B03), F4 (B09, security), F5 (B10, display) and F6 (B11, security) are broken.
+# Demo app as shipped: F1 holds; F2 (R01), F3 (R03), F4 (R09, security), F5 (R10, display) and F6 (R11, security) are broken.
 for target in (url, "--local=tests/fixtures/shipped_app.py"):  # real HTTP and in-process must give the same facts
     assert verdict("F1", target)["verdict"] == "usage"
     failed = {c["check"]: c["observed"]["status"] for r in ("F2", "F3", "F4", "F5", "F6") for c in verdict(r, target)["failed"]}
